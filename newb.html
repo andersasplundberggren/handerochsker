@@ -24,6 +24,7 @@
       --text-secondary: #6E6E73;
       --accent-blue: #5863C7;
       --accent-purple: #7B68EE;
+      --danger: #DC2626;
       --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
       --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.08);
       --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.12);
@@ -87,17 +88,17 @@
     .logo-img { height: 40px; transition: transform 0.3s ease; }
     .logo-area:hover .logo-img { transform: scale(1.05); }
     .tagline { font-size: 15px; font-weight: 500; color: var(--text-secondary); letter-spacing: -0.2px; }
-    .user-info { display: flex; align-items: center; gap: 16px; }
+    .user-info { display: flex; align-items: center; gap: 12px; }
     .user-name { font-size: 14px; color: var(--text-secondary); }
-
-    .logout-btn {
+    .pill-btn {
       background: transparent; color: var(--text-secondary);
       border: 1px solid rgba(0,0,0,0.1);
-      padding: 8px 16px; border-radius: 12px;
+      padding: 8px 14px; border-radius: 12px;
       font-size: 13px; font-weight: 600; cursor: pointer;
       transition: all 0.3s ease;
     }
-    .logout-btn:hover { color: #dc2626; border-color: rgba(220,38,38,0.3); background: rgba(220,38,38,0.05); }
+    .pill-btn:hover { color: #111827; border-color: rgba(0,0,0,0.25); background: rgba(0,0,0,0.03); }
+    .logout-btn:hover { color: var(--danger); border-color: rgba(220,38,38,0.3); background: rgba(220,38,38,0.05); }
 
     /* Login */
     .login-container {
@@ -149,7 +150,7 @@
     }
     .error-message {
       background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
-      color: #DC2626; padding: 16px 20px; border-radius: 12px; margin-bottom: 20px; font-size: 14px; font-weight: 600;
+      color: var(--danger); padding: 16px 20px; border-radius: 12px; margin-bottom: 20px; font-size: 14px; font-weight: 600;
     }
 
     /* Loader */
@@ -217,6 +218,8 @@
     .action-btn { background: transparent; border: 1px solid rgba(0,0,0,0.1); padding: 6px 10px; border-radius: 10px; cursor: pointer; }
     .action-btn.liked { background: #fee2e2; border-color: #fecaca; }
     .comment-count { color: var(--text-secondary); font-size: 13px; }
+    .delete-btn { border-color: rgba(220,38,38,0.3); color: var(--danger); }
+    .delete-btn:hover { background: rgba(220,38,38,0.06); }
 
     /* Comments */
     .comments-section { margin-top: 10px; }
@@ -229,23 +232,14 @@
 
     /* Modal */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); display: grid; place-items: center; z-index: 200; }
-    .modal-content {
-      width: min(720px, 92vw); background: #fff; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-lg);
-    }
+    .modal-content { width: min(720px, 92vw); background: #fff; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-lg); }
     .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; border-bottom: 1px solid #eee; }
     .modal-title { font-size: 18px; }
     .modal-close { border: none; background: transparent; font-size: 24px; cursor: pointer; }
     .modal-body { padding: 18px; }
-    .create-post-form .form-row { display: flex; gap: 12px; align-items: end; }
-    .create-category-btn {
-      border: 1px dashed rgba(0,0,0,0.2); background: transparent; padding: 10px 12px; border-radius: 10px; cursor: pointer; font-weight: 600;
-    }
-    .textarea-field { width: 100%; min-height: 120px; padding: 12px; border: 1px solid rgba(0,0,0,0.1); border-radius: 12px; }
-    .file-input { display: block; }
-    .file-count { font-size: 12px; color: var(--text-secondary); margin-top: 6px; }
-    .form-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 10px; }
-    .secondary-button { background: #f3f4f6; border: none; padding: 12px 16px; border-radius: 12px; cursor: pointer; }
-    .primary-btn.small { padding: 12px 18px; }
+    .confirm-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
+    .danger-btn { background: var(--danger); color: #fff; border: none; padding: 10px 16px; border-radius: 10px; cursor: pointer; }
+    .ghost-btn { background: #f3f4f6; border: none; padding: 10px 16px; border-radius: 10px; cursor: pointer; }
 
     /* Lightbox */
     .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: grid; grid-template-rows: auto 1fr; z-index: 300; }
@@ -255,6 +249,11 @@
     .lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); border: none; background: rgba(255,255,255,0.15); color: #fff; font-size: 28px; width: 44px; height: 44px; border-radius: 999px; cursor: pointer; }
     .lightbox-nav.prev { left: 18px; }
     .lightbox-nav.next { right: 18px; }
+
+    /* Trash list */
+    .trash-list { display: grid; gap: 10px; }
+    .trash-item { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; border: 1px solid #eee; border-radius: 10px; padding: 10px 12px; }
+    .small-muted { font-size: 12px; color: var(--text-secondary); }
   </style>
 </head>
 <body>
@@ -304,7 +303,6 @@
     const isKarlskogaEmail = (email) => {
       if (!email) return false;
       const e = String(email).trim().toLowerCase();
-      // kräver @karlskoga.se och minst ett '.' i local-part (förnamn.efternamn)
       return e.endsWith('@karlskoga.se') && e.split('@')[0].includes('.');
     };
 
@@ -316,7 +314,7 @@
     };
 
     /* =========================
-       KOMPONENTER
+       GENERELLA KOMPONENTER
        ========================= */
     function Loader({ text = "Laddar..." }) {
       return (
@@ -339,6 +337,18 @@
             <div className="modal-body">{children}</div>
           </div>
         </div>
+      );
+    }
+
+    function ConfirmModal({ isOpen, title = "Bekräfta", message, confirmText = "OK", cancelText = "Avbryt", onConfirm, onCancel }) {
+      return (
+        <Modal isOpen={isOpen} onClose={onCancel} title={title}>
+          <p>{message}</p>
+          <div className="confirm-actions">
+            <button className="ghost-btn" onClick={onCancel}>{cancelText}</button>
+            <button className="danger-btn" onClick={onConfirm}>{confirmText}</button>
+          </div>
+        </Modal>
       );
     }
 
@@ -408,7 +418,7 @@
           onLogin({
             email: res.email,
             sessionToken: res.sessionToken,
-            displayName: firstNameFromEmail(res.email),
+            displayName: res.displayName || firstNameFromEmail(res.email), // fallback
           });
         } catch (err) {
           setError(err.message);
@@ -600,28 +610,28 @@
               <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} className="form-input" placeholder="Ange en beskrivande titel..." required />
             </div>
 
-            <div className="form-row">
+            <div className="form-row" style={{display:'flex', gap:'12px', alignItems:'end'}}>
               <div className="form-group">
                 <label className="form-label">Kategori</label>
                 <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} className="filter-select">
                   {categories.map(cat => <option key={cat.category_id} value={cat.category_id}>{cat.name}</option>)}
                 </select>
               </div>
-              <button type="button" onClick={createCategory} className="create-category-btn">+ Ny kategori</button>
+              <button type="button" onClick={createCategory} className="pill-btn">+ Ny kategori</button>
             </div>
 
             <div className="form-group">
               <label className="form-label">Innehåll</label>
-              <textarea value={text} onChange={(e) => setText(e.target.value)} className="textarea-field" placeholder="Beskriv vad som händer..." required />
+              <textarea value={text} onChange={(e) => setText(e.target.value)} className="form-input" style="min-height:120px" placeholder="Beskriv vad som händer..." required />
             </div>
             <div className="form-group">
               <label className="form-label">Bilder (valfritt)</label>
               <input type="file" accept="image/*" multiple onChange={(e) => setFiles(Array.from(e.target.files || []))} className="file-input" />
-              {files.length > 0 && <div className="file-count">{files.length} fil(er) valda</div>}
+              {files.length > 0 && <div className="small-muted">{files.length} fil(er) valda</div>}
             </div>
-            <div className="form-actions">
-              <button type="button" onClick={onClose} className="secondary-button">Avbryt</button>
-              <button type="submit" disabled={loading} className="primary-btn small">{loading ? 'Publicerar...' : 'Publicera'}</button>
+            <div className="form-actions" style={{display:'flex', justifyContent:'flex-end', gap:'12px', marginTop:'10px'}}>
+              <button type="button" onClick={onClose} className="ghost-btn">Avbryt</button>
+              <button type="submit" disabled={loading} className="primary-btn">{loading ? 'Publicerar...' : 'Publicera'}</button>
             </div>
           </form>
         </Modal>
@@ -668,7 +678,7 @@
 
     function Comments({ postId, session }) {
       const [items, setItems] = useState([]);
-      the [text, setText] = useState('');
+      const [text, setText] = useState('');
       const [loading, setLoading] = useState(true);
 
       const load = async () => {
@@ -724,6 +734,73 @@
     }
 
     /* =========================
+       PAPPERSKORG
+       ========================= */
+    function TrashModal({ isOpen, onClose, session, onChanged }) {
+      const [loading, setLoading] = useState(true);
+      const [items, setItems] = useState([]);
+      const [error, setError] = useState('');
+
+      const loadTrash = async () => {
+        setLoading(true); setError('');
+        try {
+          const res = await api.get('posts/trash', { session: session.sessionToken });
+          if (!res.success) throw new Error(res.error || 'Kunde inte hämta papperskorg');
+          setItems(res.posts || []);
+        } catch (err) {
+          setError(err.message);
+        } finally { setLoading(false); }
+      };
+
+      useEffect(() => { if (isOpen) loadTrash(); }, [isOpen]);
+
+      const restore = async (postId) => {
+        try {
+          const res = await api.post('post/restore', { session: session.sessionToken, postId });
+          if (!res.success) throw new Error(res.error || 'Kunde inte återställa');
+          await loadTrash();
+          onChanged && onChanged();
+        } catch (err) { alert(err.message); }
+      };
+
+      const purge = async (postId) => {
+        if (!confirm('Radera permanent? Detta går inte att ångra.')) return;
+        try {
+          const res = await api.post('post/purge', { session: session.sessionToken, postId });
+          if (!res.success) throw new Error(res.error || 'Kunde inte radera permanent');
+          await loadTrash();
+          onChanged && onChanged();
+        } catch (err) { alert(err.message); }
+      };
+
+      return (
+        <Modal isOpen={isOpen} onClose={onClose} title="Papperskorg">
+          {error && <div className="error-message">{error}</div>}
+          {loading ? (
+            <Loader text="Hämtar papperskorg..." />
+          ) : items.length === 0 ? (
+            <div className="loader-text">Papperskorgen är tom.</div>
+          ) : (
+            <div className="trash-list">
+              {items.map(p => (
+                <div key={p.post_id} className="trash-item">
+                  <div>
+                    <div><strong>{p.title}</strong></div>
+                    <div className="small-muted">
+                      Av {firstNameFromEmail(p.author_email)} • {new Date(p.deleted_at || p.created_at).toLocaleString('sv-SE')}
+                    </div>
+                  </div>
+                  <button className="pill-btn" onClick={() => restore(p.post_id)}>Återställ</button>
+                  <button className="pill-btn delete-btn" onClick={() => purge(p.post_id)}>Radera permanent</button>
+                </div>
+              ))}
+            </div>
+          )}
+        </Modal>
+      );
+    }
+
+    /* =========================
        HUVUDVY
        ========================= */
     function MainPage({ session, onLogout }) {
@@ -734,6 +811,10 @@
       const [lightboxOpen, setLightboxOpen] = useState(false);
       const [lightboxImages, setLightboxImages] = useState([]);
       const [lightboxIndex, setLightboxIndex] = useState(0);
+
+      const [showTrash, setShowTrash] = useState(false);
+      const [confirmOpen, setConfirmOpen] = useState(false);
+      const [postToDelete, setPostToDelete] = useState(null);
 
       // Sök och filter
       const [searchQuery, setSearchQuery] = useState('');
@@ -770,7 +851,7 @@
 
       useEffect(() => { loadCategories(); }, []);
       useEffect(() => {
-        const timeoutId = setTimeout(() => { loadPosts(); }, 300); // Debounce
+        const timeoutId = setTimeout(() => { loadPosts(); }, 300);
         return () => clearTimeout(timeoutId);
       }, [searchQuery, categoryFilter, authorFilter]);
 
@@ -787,6 +868,25 @@
       const clearFilters = () => { setSearchQuery(''); setCategoryFilter('all'); setAuthorFilter(''); };
       const hasActiveFilters = searchQuery || categoryFilter !== 'all' || authorFilter;
 
+      const requestDelete = (post) => {
+        setPostToDelete(post);
+        setConfirmOpen(true);
+      };
+
+      const doDelete = async () => {
+        if (!postToDelete) return;
+        setConfirmOpen(false);
+        try {
+          const res = await api.post('post/delete', { session: session.sessionToken, postId: postToDelete.post_id });
+          if (!res.success) throw new Error(res.error || 'Kunde inte radera (flytta till papperskorg)');
+          await loadPosts();
+        } catch (err) {
+          alert(err.message);
+        } finally {
+          setPostToDelete(null);
+        }
+      };
+
       return (
         <>
           {/* Header */}
@@ -796,10 +896,11 @@
               <span className="tagline">kommunikationsplatsen</span>
             </a>
             <div className="user-info">
+              <button className="pill-btn" onClick={() => setShowTrash(true)} title="Visa papperskorg">Papperskorg</button>
               <span className="user-name" title={session.email}>
                 {session.displayName || firstNameFromEmail(session.email)}
               </span>
-              <button onClick={handleLogout} className="logout-btn">Logga ut</button>
+              <button onClick={handleLogout} className="pill-btn logout-btn">Logga ut</button>
             </div>
           </header>
 
@@ -844,64 +945,78 @@
               </div>
             ) : (
               <div className="posts-feed">
-                {posts.map(post => (
-                  <article key={post.post_id} className="post-card">
-                    {/* Post Header */}
-                    <div className="post-header">
-                      <div className="post-avatar">
-                        {(post.author_email || '?')[0].toUpperCase()}
-                      </div>
-                      <div className="post-meta">
-                        <h2 className="post-title">{post.title}</h2>
-                        <div className="post-author-info">
-                          <div className="post-author" title={post.author_email}>
-                            {firstNameFromEmail(post.author_email)}
-                          </div>
-                          <div className="post-date">
-                            {new Date(post.created_at).toLocaleString('sv-SE')}
-                          </div>
-                          {post.category && (
-                            <div
-                              className="category-badge"
-                              style={{ backgroundColor: post.category.color || '#6B7280' }}
-                            >
-                              {post.category.name}
-                            </div>
-                          )}
+                {posts.map(post => {
+                  const isAuthor = (post.author_email || '').toLowerCase() === (session.email || '').toLowerCase();
+                  return (
+                    <article key={post.post_id} className="post-card">
+                      {/* Post Header */}
+                      <div className="post-header">
+                        <div className="post-avatar">
+                          {(post.author_email || '?')[0].toUpperCase()}
                         </div>
+                        <div className="post-meta" style={{flex:1}}>
+                          <h2 className="post-title">{post.title}</h2>
+                          <div className="post-author-info">
+                            <div className="post-author" title={post.author_email}>
+                              {firstNameFromEmail(post.author_email)}
+                            </div>
+                            <div className="post-date">
+                              {new Date(post.created_at).toLocaleString('sv-SE')}
+                            </div>
+                            {post.category && (
+                              <div
+                                className="category-badge"
+                                style={{ backgroundColor: post.category.color || '#6B7280' }}
+                              >
+                                {post.category.name}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Delete (only author) */}
+                        {isAuthor && (
+                          <button
+                            className="pill-btn delete-btn"
+                            title="Flytta till papperskorg"
+                            onClick={() => requestDelete(post)}
+                          >
+                            Radera
+                          </button>
+                        )}
                       </div>
-                    </div>
 
-                    {/* Post Content */}
-                    <div className="post-content">{post.text}</div>
+                      {/* Post Content */}
+                      <div className="post-content">{post.text}</div>
 
-                    {/* Images */}
-                    {post.images && post.images.length > 0 && (
-                      <div className="post-images">
-                        {post.images.map((img, i) => (
-                          <img
-                            key={i}
-                            src={img.thumbnailUrl || img.directUrl}
-                            alt="Bild"
-                            className="post-image"
-                            onClick={() => openLightbox(post.images, i)}
-                          />
-                        ))}
+                      {/* Images */}
+                      {post.images && post.images.length > 0 && (
+                        <div className="post-images">
+                          {post.images.map((img, i) => (
+                            <img
+                              key={i}
+                              src={img.thumbnailUrl || img.directUrl}
+                              alt="Bild"
+                              className="post-image"
+                              onClick={() => openLightbox(post.images, i)}
+                            />
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Actions */}
+                      <div className="post-actions">
+                        <ReactionBar post={post} session={session} />
+                        <span className="comment-count">
+                          {post.comments_count || 0} kommentarer
+                        </span>
                       </div>
-                    )}
 
-                    {/* Actions */}
-                    <div className="post-actions">
-                      <ReactionBar post={post} session={session} />
-                      <span className="comment-count">
-                        {post.comments_count || 0} kommentarer
-                      </span>
-                    </div>
-
-                    {/* Comments */}
-                    <Comments postId={post.post_id} session={session} />
-                  </article>
-                ))}
+                      {/* Comments */}
+                      <Comments postId={post.post_id} session={session} />
+                    </article>
+                  );
+                })}
               </div>
             )}
           </main>
@@ -920,6 +1035,23 @@
             index={lightboxIndex}
             onClose={() => setLightboxOpen(false)}
             onIndex={setLightboxIndex}
+          />
+
+          <TrashModal
+            isOpen={showTrash}
+            onClose={() => setShowTrash(false)}
+            session={session}
+            onChanged={() => loadPosts()}
+          />
+
+          <ConfirmModal
+            isOpen={confirmOpen}
+            title="Radera inlägg?"
+            message="Vill du verkligen radera inlägget? Det flyttas till papperskorgen och kan återställas."
+            confirmText="Ja, radera"
+            cancelText="Avbryt"
+            onConfirm={doDelete}
+            onCancel={() => { setConfirmOpen(false); setPostToDelete(null); }}
           />
         </>
       );
