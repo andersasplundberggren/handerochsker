@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard - Karlskoga Portal</title>
+  <meta name="description" content="Administratörspanel för Karlskoga Portal" />
+  <meta name="theme-color" content="#F5F7FA" />
+
+  <!-- React + Babel UMD -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg-primary: #F5F7FA;
+      --bg-gradient-1: #E8ECFF;
+      --bg-gradient-2: #F0F4FF;
+      --glass-bg: rgba(255, 255, 255, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.9);
+      --text-primary: #1D1D1F;
+      --text-secondary: #6E6E73;
+      --accent-blue: #5863C7;
+      --accent-purple: #7B68EE;
+      --accent-green: #10B981;
+      --accent-orange: #F59E0B;
+      --accent-red: #EF4444;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+      --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.12);
+    }
+    
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 100%);
+      min-height: 100vh;
+      color: var(--text-primary);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Animated background orbs */
+    body::before,
+    body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.15;
+      z-index: 0;
+      animation: float 20s ease-in-out infinite;
+    }
+    
+    body::before {
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, var(--accent-blue) 0%, transparent 70%);
+      top: -200px;
+      right: -200px;
+      animation-delay: 0s;
+    }
+    
+    body::after {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, var(--accent-purple) 0%, transparent 70%);
+      bottom: -150px;
+      left: -150px;
+      animation-delay: -10s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(50px, -50px) scale(1.1); }
+      66% { transform: translate(-30px, 30px) scale(0.9); }
+    }
+
+    /* Header */
+    .admin-header {
+      position: sticky;
+      top: 20px;
+      max-width: 1400px;
+      margin: 20px auto;
+      padding: 20px 32px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 100;
+    }
+
+    .admin-logo {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .admin-logo img {
+      height: 40px;
+    }
+
+    .admin-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .admin-subtitle {
+      font-size: 14px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .admin-nav {
+      display: flex;
+      gap: 8px;
+    }
+
+    .nav-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: transparent;
+      color: var(--text-secondary);
+    }
+
+    .nav-btn.active {
+      background: var(--accent-blue);
+      color: white;
+      box-shadow: 0 4px 12px rgba(88, 99, 199, 0.3);
+    }
+
+    .nav-btn:hover:not(.active) {
+      background: rgba(88, 99, 199, 0.1);
+      color: var(--accent-blue);
+    }
+
+    /* Main Container */
+    .admin-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 32px 80px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .stat-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 32px 24px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      transition: transform 0.4s ease;
+    }
+
+    .stat-card.users::before {
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+    }
+
+    .stat-card.posts::before {
+      background: linear-gradient(90deg, var(--accent-green), #059669);
+    }
+
+    .stat-card.comments::before {
+      background: linear-gradient(90deg, var(--accent-orange), #D97706);
+    }
+
+    .stat-card.reactions::before {
+      background: linear-gradient(90deg, var(--accent-red), #DC2626);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-lg);
+      background: rgba(255, 255, 255, 0.85);
+    }
+
+    .stat-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .stat-icon {
+      font-size: 32px;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .stat-number {
+      font-size: 48px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .stat-card.users .stat-number {
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stat-card.posts .stat-number {
+      color: var(--accent-green);
+    }
+
+    .stat-card.comments .stat-number {
+      color: var(--accent-orange);
+    }
+
+    .stat-card.reactions .stat-number {
+      color: var(--accent-red);
+    }
+
+    .stat-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Data Tables */
+    .data-section {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 32px;
+      overflow: hidden;
+    }
+
+    .section-header {
+      padding: 24px 32px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .refresh-btn {
+      background: var(--accent-blue);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .refresh-btn:hover {
+      background: var(--accent-purple);
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: 16px 32px;
+      text-align: left;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .data-table th {
+      background: rgba(0, 0, 0, 0.02);
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .data-table td {
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+
+    .data-table tr:hover {
+      background: rgba(88, 99, 199, 0.05);
+    }
+
+    .user-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 12px;
+    }
+
+    .timestamp {
+      color: var(--text-secondary);
+      font-size: 12px;
+    }
+
+    .action-text {
+      font-size: 13px;
+      max-width: 300px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Loading */
+    .loader {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      text-align: center;
+    }
+
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid rgba(88, 99, 199, 0.2);
+      border-top: 4px solid var(--accent-blue);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loader-text {
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .admin-header {
+        margin: 12px;
+        padding: 16px 20px;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .admin-container {
+        padding: 0 20px 60px;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .data-table th,
+      .data-table td {
+        padding: 12px 16px;
+      }
+
+      .section-header {
+        padding: 20px 24px;
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    /* =========================
+       KONFIG - UPPDATERA MED DIN WEB APP URL
+       ========================= */
+    const API_URL = 'LÄGG_IN_DIN_WEB_APP_URL_HÄR';
+
+    /* =========================
+       API-HJÄLPARE
+       ========================= */
+    const api = {
+      async get(path, params = {}) {
+        const url = new URL(API_URL);
+        url.searchParams.set('path', path);
+        Object.entries(params).forEach(([k, v]) => {
+          if (v !== null && v !== undefined) {
+            url.searchParams.set(k, String(v));
+          }
+        });
+        
+        const res = await fetch(url.toString(), { method: 'GET', redirect: 'follow' });
+        return await res.json();
+      }
+    };
+
+    /* =========================
+       KOMPONENTER
+       ========================= */
+
+    function Loader({ text = "Laddar..." }) {
+      return (
+        <div className="loader">
+          <div className="spinner"></div>
+          <div className="loader-text">{text}</div>
+        </div>
+      );
+    }
+
+    function StatCard({ icon, number, label, type }) {
+      return (
+        <div className={`stat-card ${type}`}>
+          <span className="stat-icon">{icon}</span>
+          <span className="stat-number">{number}</span>
+          <span className="stat-label">{label}</span>
+        </div>
+      );
+    }
+
+    function UserBadge({ email }) {
+      const initial = (email || '?')[0].toUpperCase();
+      const name = email ? email.split('@')[0] : 'Okänd';
+      
+      return (
+        <div className="user-badge">
+          <div className="user-avatar">{initial}</div>
+          <div>
+            <div>{name}</div>
+            <div className="timestamp">{email}</div>
+          </div>
+        </div>
+      );
+    }
+
+    function formatTime(timestamp) {
+      return new Date(timestamp).toLocaleString('sv-SE');
+    }
+
+    /* =========================
+       ÖVERSIKT
+       ========================= */
+    function OverviewTab() {
+      const [stats, setStats] = useState(null);
+      const [recentActivity, setRecentActivity] = useState([]);
+      const [loading, setLoading] = useState(true);
+
+      const loadData = async () => {
+        setLoading(true);
+        try {
+          // Simulerar API-anrop - du behöver skapa dessa endpoints i backend
+          const mockStats = {
+            totalUsers: 23,
+            totalPosts: 47,
+            totalComments: 156,
+            totalReactions: 89
+          };
+
+          const mockActivity = [
+            { type: 'post', user: 'anna.svensson@karlskoga.se', action: 'Skapade inlägg: "Ny policy för distansarbete"', time: new Date().toISOString() },
+            { type: 'comment', user: 'erik.johansson@karlskoga.se', action: 'Kommenterade på "Digitalisering av ärendehantering"', time: new Date(Date.now() - 30000).toISOString() },
+            { type: 'reaction', user: 'maria.lindstrom@karlskoga.se', action: 'Gillade inlägg om hållbarhetsinitiativ', time: new Date(Date.now() - 120000).toISOString() },
+            { type: 'post', user: 'peter.larsson@karlskoga.se', action: 'Skapade inlägg: "Uppdatering från tekniska avdelningen"', time: new Date(Date.now() - 300000).toISOString() },
+            { type: 'comment', user: 'lisa.andersson@karlskoga.se', action: 'Kommenterade på "Personalutbildning Q2"', time: new Date(Date.now() - 450000).toISOString() }
+          ];
+
+          setStats(mockStats);
+          setRecentActivity(mockActivity);
+        } catch (err) {
+          console.error('Kunde inte ladda data:', err);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      useEffect(() => {
+        loadData();
+      }, []);
+
+      if (loading) {
+        return <Loader text="Laddar översikt..." />;
+      }
+
+      return (
+        <>
+          <div className="stats-grid">
+            <StatCard
+              icon="👥"
+              number={stats.totalUsers}
+              label="Aktiva användare"
+              type="users"
+            />
+            <StatCard
+              icon="📝"
+              number={stats.totalPosts}
+              label="Inlägg totalt"
+              type="posts"
+            />
+            <StatCard
+              icon="💬"
+              number={stats.totalComments}
+              label="Kommentarer"
+              type="comments"
+            />
+            <StatCard
+              icon="❤️"
+              number={stats.totalReactions}
+              label="Reaktioner"
+              type="reactions"
+            />
+          </div>
+
+          <div className="data-section">
+            <div className="section-header">
+              <h2 className="section-title">Senaste aktivitet</h2>
+              <button className="refresh-btn" onClick={loadData}>
+                🔄 Uppdatera
+              </button>
+            </div>
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Användare</th>
+                  <th>Aktivitet</th>
+                  <th>Tidpunkt</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentActivity.map((activity, index) => (
+                  <tr key={index}>
+                    <td>
+                      <UserBadge email={activity.user} />
+                    </td>
+                    <td>
+                      <div className="action-text">{activity.action}</div>
+                    </td>
+                    <td>
+                      <div className="timestamp">{formatTime(activity.time)}</div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      );
+    }
+
+    /* =========================
+       ANVÄNDARE
+       ========================= */
+    function UsersTab() {
+      const [users, setUsers] = useState([]);
+      const [loading, setLoading] = useState(true);
+
+      const loadUsers = async () => {
+        setLoading(true);
+        try {
+          // Simulerar användardata - implementera detta i backend
+          const mockUsers = [
+            { email: 'anna.svensson@karlskoga.se', name: 'Anna Svensson', posts: 12, comments: 34, reactions: 23, lastLogin: new Date().toISOString() },
+            { email: 'erik.johansson@karlskoga.se', name: 'Erik Johansson', posts: 8, comments: 19, reactions: 15, lastLogin: new Date(Date.now() - 3600000).toISOString() },
+            { email: 'maria.lindstrom@karlskoga.se', name: 'Maria Lindström', posts: 15, comments: 42, reactions: 31, lastLogin: new Date(Date.now() - 7200000).toISOString() },
+            { email: 'peter.larsson@karlskoga.se', name: 'Peter Larsson', posts: 6, comments: 28, reactions: 12, lastLogin: new Date(Date.now() - 86400000).toISOString() },
+            { email: 'lisa.andersson@karlskoga.se', name: 'Lisa Andersson', posts: 9, comments: 15, reactions: 8, lastLogin: new Date(Date.now() - 172800000).toISOString() }
+          ];
+
+          setUsers(mockUsers);
+        } catch (err) {
+          console.error('Kunde inte ladda användare:', err);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      useEffect(() => {
+        loadUsers();
+      }, []);
+
+      if (loading) {
+        return <Loader text="Laddar användare..." />;
+      }
+
+      return (
+        <div className="data-section">
+          <div className="section-header">
+            <h2 className="section-title">Alla användare</h2>
+            <button className="refresh-btn" onClick={loadUsers}>
+              🔄 Uppdatera
+            </button>
+          </div>
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Användare</th>
+                <th>Inlägg</th>
+                <th>Kommentarer</th>
+                <th>Reaktioner</th>
+                <th>Senaste inloggning</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map((user, index) => (
+                <tr key={index}>
+                  <td>
+                    <UserBadge email={user.email} />
+                  </td>
+                  <td>{user.posts}</td>
+                  <td>{user.comments}</td>
+                  <td>{user.reactions}</td>
+                  <td>
+                    <div className="timestamp">{formatTime(user.lastLogin)}</div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+
+    /* =========================
+       AKTIVITETSLOGG
+       ========================= */
+    function ActivityTab() {
+      const [activities, setActivities] = useState([]);
+      const [loading, setLoading] = useState(true);
+
+      const loadActivities = async () => {
+        setLoading(true);
+        try {
+          // Simulerar aktivitetsdata - implementera detta i backend
+          const mockActivities = [
+            { id: 1, type: 'login', user: 'anna.svensson@karlskoga.se', details: 'Loggade in', timestamp: new Date().toISOString() },
+            { id: 2, type: 'post_create', user: 'erik.johansson@karlskoga.se', details: 'Skapade inlägg: "Ny policy för distansarbete"', timestamp: new Date(Date.now() - 30000).toISOString() },
+            { id: 3, type: 'comment_create', user: 'maria.lindstrom@karlskoga.se', details: 'Kommenterade på inlägg #47', timestamp: new Date(Date.now() - 120000).toISOString() },
+            { id: 4, type: 'reaction_add', user: 'peter.larsson@karlskoga.se', details: 'Gillade inlägg #46', timestamp: new Date(Date.now() - 300000).toISOString() },
+            { id: 5, type: 'file_upload', user: 'lisa.andersson@karlskoga.se', details: 'Laddade upp bild: dokumentation.png', timestamp: new Date(Date.now() - 450000).toISOString() },
+            { id: 6, type: 'logout', user: 'johan.eklund@karlskoga.se', details: 'Loggade ut', timestamp: new Date(Date.now() - 600000).toISOString() }
+          ];
+
+          setActivities(mockActivities);
+        } catch (err) {
+          console.error('Kunde inte ladda aktiviteter:', err);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      useEffect(() => {
+        loadActivities();
+      }, []);
+
+      const getActivityIcon = (type) => {
+        switch (type) {
+          case 'login': return '🟢';
+          case 'logout': return '🔴';
+          case 'post_create': return '📝';
+          case 'comment_create': return '💬';
+          case 'reaction_add': return '❤️';
+          case 'file_upload': return '📁';
+          default: return '📋';
+        }
+      };
+
+      if (loading) {
+        return <Loader text="Laddar aktivitetslogg..." />;
+      }
+
+      return (
+        <div className="data-section">
+          <div className="section-header">
+            <h2 className="section-title">Aktivitetslogg</h2>
+            <button className="refresh-btn" onClick={loadActivities}>
+              🔄 Uppdatera
+            </button>
+          </div>
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Typ</th>
+                <th>Användare</th>
+                <th>Detaljer</th>
+                <th>Tidpunkt</th>
+              </tr>
+            </thead>
+            <tbody>
+              {activities.map((activity) => (
+                <tr key={activity.id}>
+                  <td>
+                    <span style={{ fontSize: '18px', marginRight: '8px' }}>
+                      {getActivityIcon(activity.type)}
+                    </span>
+                    {activity.type.replace('_', ' ')}
+                  </td>
+                  <td>
+                    <UserBadge email={activity.user} />
+                  </td>
+                  <td>
+                    <div className="action-text">{activity.details}</div>
+                  </td>
+                  <td>
+                    <div className="timestamp">{formatTime(activity.timestamp)}</div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+
+    /* =========================
+       HUVUDAPP
+       ========================= */
+    function AdminApp() {
+      const [activeTab, setActiveTab] = useState('overview');
+
+      const renderActiveTab = () => {
+        switch (activeTab) {
+          case 'overview':
+            return <OverviewTab />;
+          case 'users':
+            return <UsersTab />;
+          case 'activity':
+            return <ActivityTab />;
+          default:
+            return <OverviewTab />;
+        }
+      };
+
+      return (
+        <>
+          <header className="admin-header">
+            <div className="admin-logo">
+              <img src="./hander_och_sker.png" alt="Karlskoga Portal" />
+              <div>
+                <div className="admin-title">Admin Dashboard</div>
+                <div className="admin-subtitle">Karlskoga Portal</div>
+              </div>
+            </div>
+            <nav className="admin-nav">
+              <button
+                className={`nav-btn ${activeTab === 'overview' ? 'active' : ''}`}
+                onClick={() => setActiveTab('overview')}
+              >
+                📊 Översikt
+              </button>
+              <button
+                className={`nav-btn ${activeTab === 'users' ? 'active' : ''}`}
+                onClick={() => setActiveTab('users')}
+              >
+                👥 Användare
+              </button>
+              <button
+                className={`nav-btn ${activeTab === 'activity' ? 'active' : ''}`}
+                onClick={() => setActiveTab('activity')}
+              >
+                📋 Aktivitetslogg
+              </button>
+            </nav>
+          </header>
+
+          <main className="admin-container">
+            {renderActiveTab()}
+          </main>
+        </>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<AdminApp />);
+  </script>
+</body>
+</html>
