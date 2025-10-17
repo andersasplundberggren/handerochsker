@@ -499,24 +499,18 @@
       const loadData = async () => {
         setLoading(true);
         try {
-          // Simulerar API-anrop - du behöver skapa dessa endpoints i backend
-          const mockStats = {
-            totalUsers: 23,
-            totalPosts: 47,
-            totalComments: 156,
-            totalReactions: 89
-          };
+          const [statsRes, activityRes] = await Promise.all([
+            api.get('admin/stats'),
+            api.get('admin/activity')
+          ]);
 
-          const mockActivity = [
-            { type: 'post', user: 'anna.svensson@karlskoga.se', action: 'Skapade inlägg: "Ny policy för distansarbete"', time: new Date().toISOString() },
-            { type: 'comment', user: 'erik.johansson@karlskoga.se', action: 'Kommenterade på "Digitalisering av ärendehantering"', time: new Date(Date.now() - 30000).toISOString() },
-            { type: 'reaction', user: 'maria.lindstrom@karlskoga.se', action: 'Gillade inlägg om hållbarhetsinitiativ', time: new Date(Date.now() - 120000).toISOString() },
-            { type: 'post', user: 'peter.larsson@karlskoga.se', action: 'Skapade inlägg: "Uppdatering från tekniska avdelningen"', time: new Date(Date.now() - 300000).toISOString() },
-            { type: 'comment', user: 'lisa.andersson@karlskoga.se', action: 'Kommenterade på "Personalutbildning Q2"', time: new Date(Date.now() - 450000).toISOString() }
-          ];
+          if (statsRes.success) {
+            setStats(statsRes.stats);
+          }
 
-          setStats(mockStats);
-          setRecentActivity(mockActivity);
+          if (activityRes.success) {
+            setRecentActivity(activityRes.activities.slice(0, 10)); // Visa bara de 10 senaste
+          }
         } catch (err) {
           console.error('Kunde inte ladda data:', err);
         } finally {
