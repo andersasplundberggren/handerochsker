@@ -2,24 +2,858 @@
 <html lang="sv">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Karlskoga Portal</title>
+  <meta name="description" content="En gemensam kommunikationsplats för medarbetare på Karlskoga kommun" />
+  <meta name="theme-color" content="#F5F7FA" />
 
   <!-- React + Babel UMD -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
   <style>
-    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-    .modal-overlay { backdrop-filter: blur(4px); }
-    .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg-primary: #F5F7FA;
+      --bg-gradient-1: #E8ECFF;
+      --bg-gradient-2: #F0F4FF;
+      --glass-bg: rgba(255, 255, 255, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.9);
+      --text-primary: #1D1D1F;
+      --text-secondary: #6E6E73;
+      --accent-blue: #5863C7;
+      --accent-purple: #7B68EE;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+      --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.12);
+    }
+    
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 100%);
+      min-height: 100vh;
+      color: var(--text-primary);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Animated background orbs */
+    body::before,
+    body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.15;
+      z-index: 0;
+      animation: float 20s ease-in-out infinite;
+    }
+    
+    body::before {
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, var(--accent-blue) 0%, transparent 70%);
+      top: -200px;
+      right: -200px;
+      animation-delay: 0s;
+    }
+    
+    body::after {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, var(--accent-purple) 0%, transparent 70%);
+      bottom: -150px;
+      left: -150px;
+      animation-delay: -10s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(50px, -50px) scale(1.1); }
+      66% { transform: translate(-30px, 30px) scale(0.9); }
+    }
+
+    /* Glass Header */
+    .glass-header {
+      position: sticky;
+      top: 20px;
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 16px 32px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 100;
+      transition: all 0.3s ease;
+    }
+
+    .glass-header:hover {
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-2px);
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      text-decoration: none;
+    }
+
+    .logo-img {
+      height: 40px;
+      transition: transform 0.3s ease;
+    }
+
+    .logo-area:hover .logo-img {
+      transform: scale(1.05);
+    }
+
+    .tagline {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      letter-spacing: -0.2px;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .user-name {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .logout-btn {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .logout-btn:hover {
+      color: #dc2626;
+      border-color: rgba(220, 38, 38, 0.3);
+      background: rgba(220, 38, 38, 0.05);
+    }
+
+    /* Login Page */
+    .login-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .login-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid var(--glass-border);
+      border-radius: 32px;
+      padding: 60px 50px;
+      box-shadow: var(--shadow-lg);
+      text-align: center;
+      max-width: 500px;
+      width: 100%;
+      transition: all 0.3s ease;
+    }
+
+    .login-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.15);
+    }
+
+    .login-logo {
+      height: 120px;
+      margin-bottom: 32px;
+      filter: drop-shadow(0 10px 40px rgba(0, 0, 0, 0.1));
+    }
+
+    .login-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+      letter-spacing: -1px;
+    }
+
+    .login-subtitle {
+      font-size: 16px;
+      color: var(--text-secondary);
+      margin-bottom: 40px;
+    }
+
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .form-group {
+      text-align: left;
+    }
+
+    .form-label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+      font-size: 14px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 16px 20px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 16px;
+      font-size: 16px;
+      background: rgba(255, 255, 255, 0.8);
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 0 0 3px rgba(88, 99, 199, 0.1);
+    }
+
+    .form-input.otp-input {
+      text-align: center;
+      font-size: 24px;
+      letter-spacing: 4px;
+      font-weight: 600;
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+      color: white;
+      border: none;
+      padding: 16px 32px;
+      border-radius: 16px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 24px rgba(88, 99, 199, 0.3);
+    }
+
+    .primary-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(123, 104, 238, 0.4);
+    }
+
+    .primary-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .secondary-btn {
+      background: transparent;
+      color: var(--text-secondary);
+      border: none;
+      padding: 12px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .secondary-btn:hover {
+      color: var(--accent-blue);
+    }
+
+    .success-message {
+      background: linear-gradient(135deg, #D4F4E7 0%, #C0F0DC 100%);
+      color: #0A7D52;
+      padding: 16px 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .error-message {
+      background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+      color: #DC2626;
+      padding: 16px 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    /* Main Layout */
+    .main-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 32px 80px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Create Post */
+    .create-post-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 32px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .create-post-card:hover {
+      background: rgba(255, 255, 255, 0.85);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .create-post-prompt {
+      color: var(--text-secondary);
+      font-size: 16px;
+      text-align: left;
+    }
+
+    /* Posts Feed */
+    .posts-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .post-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+    }
+
+    .post-card:hover {
+      background: rgba(255, 255, 255, 0.85);
+      box-shadow: var(--shadow-md);
+    }
+
+    .post-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .post-avatar {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .post-author-info {
+      flex: 1;
+    }
+
+    .post-author {
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .post-date {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .post-content {
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+      white-space: pre-wrap;
+    }
+
+    .post-images {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .post-image {
+      border-radius: 16px;
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .post-image:hover {
+      transform: scale(1.02);
+      box-shadow: var(--shadow-md);
+    }
+
+    .post-actions {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
+      margin-bottom: 20px;
+    }
+
+    .action-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .action-btn.liked {
+      background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+      border-color: rgba(220, 38, 38, 0.3);
+      color: #DC2626;
+    }
+
+    .action-btn:hover:not(.liked) {
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    .action-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .comment-count {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* Comments */
+    .comments-section {
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
+      padding-top: 20px;
+    }
+
+    .comment {
+      background: rgba(0, 0, 0, 0.03);
+      border-radius: 16px;
+      padding: 16px 20px;
+      margin-bottom: 12px;
+    }
+
+    .comment-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .comment-author {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+
+    .comment-date {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .comment-text {
+      font-size: 14px;
+      color: var(--text-primary);
+      line-height: 1.5;
+    }
+
+    .comment-form {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .comment-input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 20px;
+      font-size: 14px;
+      background: rgba(255, 255, 255, 0.8);
+      transition: all 0.3s ease;
+    }
+
+    .comment-input:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 0 0 2px rgba(88, 99, 199, 0.1);
+    }
+
+    .comment-submit {
+      background: var(--accent-blue);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .comment-submit:hover {
+      background: var(--accent-purple);
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-content {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      width: 100%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .modal-header {
+      padding: 24px 32px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      font-size: 24px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+    }
+
+    .modal-close:hover {
+      background: rgba(0, 0, 0, 0.05);
+      color: var(--text-primary);
+    }
+
+    .modal-body {
+      padding: 32px;
+    }
+
+    .create-post-form {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .textarea-field {
+      width: 100%;
+      min-height: 120px;
+      padding: 16px 20px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 16px;
+      font-size: 16px;
+      background: rgba(255, 255, 255, 0.8);
+      resize: vertical;
+      font-family: inherit;
+      transition: all 0.3s ease;
+    }
+
+    .textarea-field:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 0 0 3px rgba(88, 99, 199, 0.1);
+    }
+
+    .file-input {
+      width: 100%;
+      padding: 16px 20px;
+      border: 2px dashed rgba(0, 0, 0, 0.1);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.5);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .file-input:hover {
+      border-color: var(--accent-blue);
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    .file-count {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 8px;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 16px;
+      justify-content: flex-end;
+      padding-top: 16px;
+    }
+
+    .secondary-button {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .secondary-button:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    /* Lightbox */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.95);
+      display: flex;
+      flex-direction: column;
+      z-index: 2000;
+    }
+
+    .lightbox-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      color: white;
+    }
+
+    .lightbox-close {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: white;
+      font-size: 24px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .lightbox-close:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .lightbox-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .lightbox-image {
+      max-width: 95%;
+      max-height: 95%;
+      object-fit: contain;
+    }
+
+    .lightbox-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0, 0, 0, 0.5);
+      border: none;
+      color: white;
+      font-size: 32px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .lightbox-nav:hover {
+      background: rgba(0, 0, 0, 0.7);
+    }
+
+    .lightbox-nav.prev {
+      left: 24px;
+    }
+
+    .lightbox-nav.next {
+      right: 24px;
+    }
+
+    .lightbox-counter {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 14px;
+    }
+
+    /* Loading */
+    .loader {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      text-align: center;
+    }
+
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid rgba(88, 99, 199, 0.2);
+      border-top: 4px solid var(--accent-blue);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loader-text {
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    /* Empty State */
+    .empty-state {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 60px 40px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .empty-state-text {
+      color: var(--text-secondary);
+      font-size: 16px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .glass-header {
+        margin: 12px;
+        padding: 12px 20px;
+      }
+
+      .logo-img {
+        height: 32px;
+      }
+
+      .tagline {
+        display: none;
+      }
+
+      .main-container {
+        padding: 0 20px 60px;
+      }
+
+      .login-card {
+        padding: 40px 30px;
+        margin: 20px;
+      }
+
+      .login-logo {
+        height: 80px;
+      }
+
+      .login-title {
+        font-size: 24px;
+      }
+
+      .post-card {
+        padding: 24px;
+      }
+
+      .modal-content {
+        margin: 20px;
+        max-width: calc(100% - 40px);
+      }
+
+      .modal-header,
+      .modal-body {
+        padding: 20px;
+      }
+
+      .post-images {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
-<body class="bg-gray-50">
+<body>
   <div id="root"></div>
 
   <script type="text/babel">
@@ -28,7 +862,7 @@
     /* =========================
        KONFIG - UPPDATERA MED DIN WEB APP URL
        ========================= */
-    const API_URL = 'https://script.google.com/macros/s/AKfycbwNvIkwjD0-m32lT1RyM25zSC1CHkkUdR8Ra5Hvmoe0UM30oeBqRx3A4wvGzUsMJw/exec';
+    const API_URL = 'LÄGG_IN_DIN_WEB_APP_URL_HÄR';
 
     /* =========================
        API-HJÄLPARE
@@ -70,66 +904,70 @@
     };
 
     /* =========================
-       UI: Modal
+       KOMPONENTER
        ========================= */
-    function Modal({ isOpen, onClose, title, children, wide = false }) {
-      if (!isOpen) return null;
+
+    function Loader({ text = "Laddar..." }) {
       return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <div className={"bg-white rounded-2xl shadow-2xl w-full max-h-[90vh] overflow-y-auto " + (wide ? "max-w-3xl" : "max-w-xl")}>
-            <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
-              <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-3xl leading-none">×</button>
+        <div className="loader">
+          <div className="spinner"></div>
+          <div className="loader-text">{text}</div>
+        </div>
+      );
+    }
+
+    function Modal({ isOpen, onClose, title, children }) {
+      if (!isOpen) return null;
+
+      return (
+        <div className="modal-overlay" onClick={onClose}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2 className="modal-title">{title}</h2>
+              <button className="modal-close" onClick={onClose}>×</button>
             </div>
-            <div className="p-6">{children}</div>
+            <div className="modal-body">
+              {children}
+            </div>
           </div>
         </div>
       );
     }
 
-    /* =========================
-       LOADER
-       ========================= */
-    function Loader({ text = "Laddar..." }) {
-      return (
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin mb-4"></div>
-          <div className="text-gray-700 font-semibold">{text}</div>
-        </div>
-      );
-    }
-
-    /* =========================
-       LIGHTBOX
-       ========================= */
     function ImageLightbox({ isOpen, images, index, onClose, onIndex }) {
       if (!isOpen || !images || images.length === 0) return null;
       const img = images[index] || images[0];
 
-      const prev = (e) => { e?.stopPropagation(); onIndex((index - 1 + images.length) % images.length); };
-      const next = (e) => { e?.stopPropagation(); onIndex((index + 1) % images.length); };
+      const prev = (e) => {
+        e?.stopPropagation();
+        onIndex((index - 1 + images.length) % images.length);
+      };
+
+      const next = (e) => {
+        e?.stopPropagation();
+        onIndex((index + 1) % images.length);
+      };
 
       return (
-        <div className="fixed inset-0 z-[9999] bg-black/90 flex flex-col" onClick={onClose}>
-          <div className="flex items-center justify-between p-4 text-white">
-            <button onClick={onClose} className="text-3xl leading-none">×</button>
-            <div className="text-sm opacity-80">{index + 1}/{images.length}</div>
+        <div className="lightbox" onClick={onClose}>
+          <div className="lightbox-header">
+            <div className="lightbox-counter">{index + 1}/{images.length}</div>
+            <button className="lightbox-close" onClick={onClose}>×</button>
           </div>
-          <div className="flex-1 flex items-center justify-center px-4">
+          <div className="lightbox-content">
             <img
               src={img.directUrl || img.thumbnailUrl}
               alt=""
-              className="max-h-[85vh] max-w-[95vw] object-contain"
+              className="lightbox-image"
               onClick={(e) => e.stopPropagation()}
-              loading="lazy"
             />
+            {images.length > 1 && (
+              <>
+                <button className="lightbox-nav prev" onClick={prev}>‹</button>
+                <button className="lightbox-nav next" onClick={next}>›</button>
+              </>
+            )}
           </div>
-          {images.length > 1 && (
-            <div className="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-2 pointer-events-none">
-              <button onClick={prev} className="pointer-events-auto text-white text-3xl px-3 py-1 rounded hover:bg-white/10">‹</button>
-              <button onClick={next} className="pointer-events-auto text-white text-3xl px-3 py-1 rounded hover:bg-white/10">›</button>
-            </div>
-          )}
         </div>
       );
     }
@@ -175,71 +1013,68 @@
       };
 
       return (
-        <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 to-indigo-100">
-          <div className="w-full max-w-md">
-            <div className="bg-white rounded-2xl shadow-xl p-8">
-              <div className="text-center mb-8">
-                <h1 className="text-3xl font-bold text-gray-800 mb-2">Karlskoga Portal</h1>
-                <p className="text-gray-600">Logga in med din @karlskoga.se-adress</p>
-              </div>
+        <div className="login-container">
+          <div className="login-card">
+            <img src="./hander_och_sker.png" alt="Karlskoga Portal" className="login-logo" />
+            <h1 className="login-title">Karlskoga Portal</h1>
+            <p className="login-subtitle">Logga in med din @karlskoga.se-adress</p>
 
-              {!otpSent ? (
-                <form onSubmit={requestOTP} className="space-y-4">
-                  {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">{error}</div>}
-                  <div>
-                    <label className="block text-gray-700 font-semibold mb-2">E-postadress</label>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="ditt.namn@karlskoga.se"
-                      required
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 font-semibold"
-                  >
-                    {loading ? 'Skickar...' : 'Skicka inloggningskod'}
-                  </button>
-                </form>
-              ) : (
-                <form onSubmit={verifyOTP} className="space-y-4">
-                  {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">{error}</div>}
-                  <div className="text-green-700 text-center bg-green-50 p-3 rounded">
-                    Kod skickad till {email}
-                  </div>
-                  <div>
-                    <label className="block text-gray-700 font-semibold mb-2">Ange kod</label>
-                    <input
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value)}
-                      maxLength="6"
-                      inputMode="numeric"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg text-center text-2xl tracking-widest focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="123456"
-                      required
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 font-semibold"
-                  >
-                    {loading ? 'Verifierar...' : 'Logga in'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setOtpSent(false)}
-                    className="w-full text-gray-600 hover:text-gray-800 py-2"
-                  >
-                    Skicka ny kod
-                  </button>
-                </form>
-              )}
-            </div>
+            {!otpSent ? (
+              <form onSubmit={requestOTP} className="login-form">
+                {error && <div className="error-message">{error}</div>}
+                <div className="form-group">
+                  <label className="form-label">E-postadress</label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="form-input"
+                    placeholder="ditt.namn@karlskoga.se"
+                    required
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="primary-btn"
+                >
+                  {loading ? 'Skickar...' : 'Skicka inloggningskod'}
+                </button>
+              </form>
+            ) : (
+              <form onSubmit={verifyOTP} className="login-form">
+                {error && <div className="error-message">{error}</div>}
+                <div className="success-message">
+                  Kod skickad till {email}
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Ange kod</label>
+                  <input
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    maxLength="6"
+                    inputMode="numeric"
+                    className="form-input otp-input"
+                    placeholder="123456"
+                    required
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="primary-btn"
+                >
+                  {loading ? 'Verifierar...' : 'Logga in'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setOtpSent(false)}
+                  className="secondary-btn"
+                >
+                  Skicka ny kod
+                </button>
+              </form>
+            )}
           </div>
         </div>
       );
@@ -304,45 +1139,44 @@
       };
 
       return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Nytt inlägg" wide>
-          {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-gray-700 font-semibold mb-2">Vad händer?</label>
+        <Modal isOpen={isOpen} onClose={onClose} title="Nytt inlägg">
+          {error && <div className="error-message">{error}</div>}
+          <form onSubmit={handleSubmit} className="create-post-form">
+            <div className="form-group">
+              <label className="form-label">Vad händer?</label>
               <textarea
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                rows="5"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="textarea-field"
                 placeholder="Skriv något..."
                 required
               />
             </div>
-            <div>
-              <label className="block text-gray-700 font-semibold mb-2">Bilder (valfritt)</label>
+            <div className="form-group">
+              <label className="form-label">Bilder (valfritt)</label>
               <input
                 type="file"
                 accept="image/*"
                 multiple
                 onChange={(e) => setFiles(Array.from(e.target.files || []))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                className="file-input"
               />
               {files.length > 0 && (
-                <div className="text-sm text-gray-600 mt-2">{files.length} fil(er) valda</div>
+                <div className="file-count">{files.length} fil(er) valda</div>
               )}
             </div>
-            <div className="flex gap-3 pt-4">
+            <div className="form-actions">
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="secondary-button"
               >
                 Avbryt
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+                className="primary-btn"
               >
                 {loading ? 'Publicerar...' : 'Publicera'}
               </button>
@@ -391,7 +1225,7 @@
         <button
           onClick={toggle}
           disabled={busy}
-          className={"px-3 py-1 rounded-lg border text-sm font-medium " + (hasLiked ? "bg-pink-100 border-pink-300 text-pink-700" : "border-gray-300 text-gray-700 hover:bg-gray-50")}
+          className={`action-btn ${hasLiked ? 'liked' : ''}`}
         >
           {hasLiked ? '❤️' : '♡'} {count}
         </button>
@@ -425,36 +1259,36 @@
       };
 
       return (
-        <div className="mt-4">
+        <div className="comments-section">
           {loading ? (
-            <div className="text-gray-500 text-sm">Laddar kommentarer...</div>
+            <div className="loader-text">Laddar kommentarer...</div>
           ) : items.length === 0 ? (
-            <div className="text-gray-500 text-sm">Inga kommentarer ännu.</div>
+            <div className="loader-text">Inga kommentarer ännu.</div>
           ) : (
-            <div className="space-y-3 mb-4">
+            <div>
               {items.map(c => (
-                <div key={c.comment_id} className="bg-gray-50 rounded-lg p-3">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-semibold text-gray-800">{c.user_email.split('@')[0]}</span>
-                    <span className="text-gray-500 text-xs">
+                <div key={c.comment_id} className="comment">
+                  <div className="comment-header">
+                    <span className="comment-author">{c.user_email.split('@')[0]}</span>
+                    <span className="comment-date">
                       {new Date(c.created_at).toLocaleString('sv-SE')}
                     </span>
                   </div>
-                  <div className="text-gray-800">{c.text}</div>
+                  <div className="comment-text">{c.text}</div>
                 </div>
               ))}
             </div>
           )}
-          <form onSubmit={submit} className="flex gap-2">
+          <form onSubmit={submit} className="comment-form">
             <input
               value={text}
               onChange={(e) => setText(e.target.value)}
               placeholder="Skriv en kommentar..."
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="comment-input"
             />
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="comment-submit"
             >
               Skicka
             </button>
@@ -506,73 +1340,73 @@
       };
 
       return (
-        <div className="min-h-screen bg-gray-50">
+        <>
           {/* Header */}
-          <header className="bg-white shadow-sm border-b">
-            <div className="max-w-2xl mx-auto px-4 py-4 flex justify-between items-center">
-              <h1 className="text-2xl font-bold text-gray-800">Karlskoga Portal</h1>
-              <div className="flex items-center gap-4">
-                <span className="text-gray-600 text-sm">{session.email.split('@')[0]}</span>
-                <button
-                  onClick={handleLogout}
-                  className="text-red-600 hover:text-red-800 text-sm"
-                >
-                  Logga ut
-                </button>
-              </div>
+          <header className="glass-header">
+            <div className="logo-area">
+              <img src="./hander_och_sker.png" alt="Karlskoga Portal" className="logo-img" />
+              <span className="tagline">kommunikationsplatsen</span>
+            </div>
+            <div className="user-info">
+              <span className="user-name">{session.email.split('@')[0]}</span>
+              <button onClick={handleLogout} className="logout-btn">
+                Logga ut
+              </button>
             </div>
           </header>
 
-          {/* Create Post Button */}
-          <div className="max-w-2xl mx-auto px-4 py-6">
-            <button
+          {/* Main Content */}
+          <main className="main-container">
+            {/* Create Post Button */}
+            <div
+              className="create-post-card"
               onClick={() => setShowCreatePost(true)}
-              className="w-full bg-white border border-gray-300 rounded-lg p-4 text-left text-gray-500 hover:bg-gray-50 transition-colors"
             >
-              Vad händer, {session.email.split('@')[0]}?
-            </button>
-          </div>
+              <div className="create-post-prompt">
+                Vad händer, {session.email.split('@')[0]}?
+              </div>
+            </div>
 
-          {/* Posts Feed */}
-          <main className="max-w-2xl mx-auto px-4 pb-8">
+            {/* Posts Feed */}
             {loading ? (
               <Loader text="Laddar inlägg..." />
             ) : posts.length === 0 ? (
-              <div className="bg-white rounded-lg shadow p-8 text-center text-gray-600">
-                Inga inlägg ännu. Var den första att posta något!
+              <div className="empty-state">
+                <div className="empty-state-text">
+                  Inga inlägg ännu. Var den första att posta något!
+                </div>
               </div>
             ) : (
-              <div className="space-y-6">
+              <div className="posts-feed">
                 {posts.map(post => (
-                  <div key={post.post_id} className="bg-white rounded-lg shadow p-6">
+                  <article key={post.post_id} className="post-card">
                     {/* Post Header */}
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
+                    <div className="post-header">
+                      <div className="post-avatar">
                         {(post.author_email || '?')[0].toUpperCase()}
                       </div>
-                      <div>
-                        <div className="font-semibold text-gray-800">
+                      <div className="post-author-info">
+                        <div className="post-author">
                           {post.author_email.split('@')[0]}
                         </div>
-                        <div className="text-sm text-gray-500">
+                        <div className="post-date">
                           {new Date(post.created_at).toLocaleString('sv-SE')}
                         </div>
                       </div>
                     </div>
 
                     {/* Post Content */}
-                    <p className="text-gray-800 mb-4 whitespace-pre-wrap">{post.text}</p>
+                    <div className="post-content">{post.text}</div>
 
                     {/* Images */}
                     {post.images && post.images.length > 0 && (
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4">
+                      <div className="post-images">
                         {post.images.map((img, i) => (
                           <img
                             key={i}
                             src={img.thumbnailUrl || img.directUrl}
-                            loading="lazy"
                             alt="Bild"
-                            className="rounded-lg w-full h-44 object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                            className="post-image"
                             onClick={() => openLightbox(post.images, i)}
                           />
                         ))}
@@ -580,16 +1414,16 @@
                     )}
 
                     {/* Actions */}
-                    <div className="flex items-center gap-4 mb-4 pt-2 border-t">
+                    <div className="post-actions">
                       <ReactionBar post={post} session={session} />
-                      <span className="text-sm text-gray-500">
+                      <span className="comment-count">
                         {post.comments_count || 0} kommentarer
                       </span>
                     </div>
 
                     {/* Comments */}
                     <Comments postId={post.post_id} session={session} />
-                  </div>
+                  </article>
                 ))}
               </div>
             )}
@@ -610,7 +1444,7 @@
             onClose={() => setLightboxOpen(false)}
             onIndex={setLightboxIndex}
           />
-        </div>
+        </>
       );
     }
 
@@ -644,11 +1478,7 @@
       };
 
       if (loading) {
-        return (
-          <div className="min-h-screen flex items-center justify-center">
-            <Loader text="Startar..." />
-          </div>
-        );
+        return <Loader text="Startar..." />;
       }
 
       if (!session) {
