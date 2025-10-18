@@ -1,3 +1,157 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Karlskoga Portal</title>
+  <meta name="description" content="En gemensam kommunikationsplats för medarbetare på Karlskoga kommun" />
+  <meta name="theme-color" content="#F5F7FA" />
+
+  <!-- React + Babel UMD -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg-primary: #F5F7FA;
+      --bg-gradient-1: #E8ECFF;
+      --bg-gradient-2: #F0F4FF;
+      --glass-bg: rgba(255,255,255,0.7);
+      --glass-border: rgba(255,255,255,0.9);
+      --text-primary: #1D1D1F;
+      --text-secondary: #6E6E73;
+      --accent-blue: #5863C7;
+      --accent-purple: #7B68EE;
+      --danger: #DC2626;
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+      --shadow-md: 0 8px 32px rgba(0,0,0,0.08);
+      --shadow-lg: 0 20px 60px rgba(0,0,0,0.12);
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 100%);
+      min-height: 100vh; color: var(--text-primary); line-height: 1.6;
+      -webkit-font-smoothing: antialiased; position: relative; overflow-x: hidden;
+    }
+    body::before, body::after {
+      content: ''; position: fixed; border-radius: 50%; filter: blur(80px); opacity: 0.15; z-index: 0; animation: float 20s ease-in-out infinite;
+    }
+    body::before { width: 600px; height: 600px; background: radial-gradient(circle, var(--accent-blue) 0%, transparent 70%); top: -200px; right: -200px; }
+    body::after  { width: 500px; height: 500px; background: radial-gradient(circle, var(--accent-purple) 0%, transparent 70%); bottom: -150px; left: -150px; animation-delay: -10s; }
+    @keyframes float { 0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(50px,-50px) scale(1.1)} 66%{transform:translate(-30px,30px) scale(0.9)} }
+
+    .glass-header {
+      position: sticky; top: 20px; max-width: 1200px; margin: 20px auto; padding: 16px 32px;
+      background: var(--glass-bg); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid var(--glass-border); border-radius: 20px; box-shadow: var(--shadow-md);
+      display: flex; align-items: center; justify-content: space-between; z-index: 100; transition: all .3s ease;
+    }
+    .glass-header:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+    .logo-area { display:flex; align-items:center; gap:16px; text-decoration:none; }
+    .logo-img { height: 40px; transition: transform .3s ease; }
+    .logo-area:hover .logo-img { transform: scale(1.05); }
+    .tagline { font-size: 15px; font-weight: 500; color: var(--text-secondary); letter-spacing: -0.2px; }
+    .user-info { display:flex; align-items:center; gap:12px; }
+    .user-name { font-size: 14px; color: var(--text-secondary); }
+    .pill-btn {
+      background: transparent; color: var(--text-secondary); border: 1px solid rgba(0,0,0,.1);
+      padding: 8px 14px; border-radius: 12px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all .3s ease;
+    }
+    .pill-btn:hover { color:#111827; border-color: rgba(0,0,0,.25); background: rgba(0,0,0,.03); }
+    .logout-btn:hover { color: var(--danger); border-color: rgba(220,38,38,.3); background: rgba(220,38,38,.05); }
+
+    .login-container { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:32px; position:relative; z-index:1; }
+    .login-card { background:var(--glass-bg); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border:1px solid var(--glass-border); border-radius:32px; padding:60px 50px; box-shadow:var(--shadow-lg); text-align:center; max-width:500px; width:100%; transition: all .3s ease; }
+    .login-card:hover { transform: translateY(-8px); box-shadow: 0 30px 80px rgba(0,0,0,.15); }
+    .login-logo { height:120px; margin-bottom:32px; filter: drop-shadow(0 10px 40px rgba(0,0,0,.1)); }
+    .login-title { font-size:32px; font-weight:700; color:var(--text-primary); margin-bottom:12px; letter-spacing:-1px; }
+    .login-subtitle { font-size:16px; color:var(--text-secondary); margin-bottom:40px; }
+
+    .login-form { display:flex; flex-direction:column; gap:20px; }
+    .form-group { text-align:left; }
+    .form-label { display:block; font-weight:600; margin-bottom:8px; color:var(--text-primary); font-size:14px; }
+    .form-input { width:100%; padding:16px 20px; border:1px solid rgba(0,0,0,.1); border-radius:16px; font-size:16px; background:rgba(255,255,255,.8); transition: all .3s ease; font-family: inherit; }
+    .form-input:focus { outline:none; border-color:var(--accent-blue); background:rgba(255,255,255,.95); box-shadow:0 0 0 3px rgba(88,99,199,.1); }
+    .form-input.otp-input { text-align:center; font-size:24px; letter-spacing:4px; font-weight:600; }
+
+    .primary-btn {
+      background:linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); color:#fff; border:none; padding:16px 32px; border-radius:16px; font-size:16px; font-weight:600; cursor:pointer; transition: all .3s ease; box-shadow:0 8px 24px rgba(88,99,199,.3);
+    }
+    .primary-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(123,104,238,.4); }
+    .primary-btn:disabled { opacity:.6; cursor:not-allowed; transform:none; }
+    .secondary-btn { background:transparent; color:var(--text-secondary); border:none; padding:12px; font-size:14px; cursor:pointer; transition: color .3s ease; }
+    .secondary-btn:hover { color:var(--accent-blue); }
+    .success-message { background:linear-gradient(135deg,#D4F4E7 0%,#C0F0DC 100%); color:#0A7D52; padding:16px 20px; border-radius:12px; margin-bottom:20px; font-size:14px; font-weight:600; }
+    .error-message { background:linear-gradient(135deg,#FEE2E2 0%,#FECACA 100%); color:var(--danger); padding:16px 20px; border-radius:12px; margin-bottom:20px; font-size:14px; font-weight:600; }
+
+    .loader { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; padding:40px; }
+    .spinner { width:28px; height:28px; border-radius:50%; border:3px solid rgba(0,0,0,.1); border-top-color: var(--accent-blue); animation: spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loader-text { color:var(--text-secondary); font-size:14px; }
+
+    .main-container { max-width:900px; margin:0 auto; padding:0 32px 80px; position:relative; z-index:1; }
+
+    .search-filters { background:var(--glass-bg); backdrop-filter: blur(20px) saturate(180%); border:1px solid var(--glass-border); border-radius:24px; padding:24px; box-shadow:var(--shadow-sm); margin-bottom:32px; transition: all .3s ease; }
+    .search-filters:hover { background: rgba(255,255,255,.85); box-shadow: var(--shadow-md); }
+    .search-row { display:grid; grid-template-columns: 1fr auto auto auto; gap:16px; align-items:end; }
+    .search-input, .filter-select { padding:12px 16px; border:1px solid rgba(0,0,0,.1); border-radius:12px; font-size:14px; background:rgba(255,255,255,.8); transition: all .3s ease; }
+    .search-input:focus, .filter-select:focus { outline:none; border-color:var(--accent-blue); background:rgba(255,255,255,.95); box-shadow:0 0 0 2px rgba(88,99,199,.1); }
+    .clear-btn { background:var(--accent-blue); color:#fff; border:none; padding:12px 20px; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer; transition: all .3s ease; }
+    .clear-btn:hover { background:var(--accent-purple); }
+    .results-count { text-align:center; color:var(--text-secondary); font-size:14px; margin-bottom:24px; }
+
+    .create-post-card { background:var(--glass-bg); backdrop-filter: blur(20px) saturate(180%); border:1px solid var(--glass-border); border-radius:24px; padding:24px; box-shadow:var(--shadow-sm); margin-bottom:32px; cursor:pointer; transition: all .3s ease; }
+    .create-post-card:hover { background:rgba(255,255,255,.85); box-shadow:var(--shadow-md); transform: translateY(-2px); }
+    .create-post-prompt { color:var(--text-secondary); font-size:16px; text-align:left; }
+
+    .posts-feed { display:flex; flex-direction:column; gap:24px; }
+    .post-card { background:var(--glass-bg); border:1px solid var(--glass-border); border-radius:20px; padding:20px; box-shadow:var(--shadow-sm); }
+    .post-header { display:flex; gap:12px; align-items:center; margin-bottom:10px; }
+    .post-avatar { width:40px; height:40px; border-radius:50%; background:#e5e7eb; color:#111827; display:grid; place-items:center; font-weight:700; }
+    .post-meta { display:grid; gap:6px; }
+    .post-title { font-size:18px; letter-spacing:-0.2px; }
+    .post-author-info { display:flex; gap:12px; align-items:center; flex-wrap:wrap; color:var(--text-secondary); font-size:13px; }
+    .category-badge { padding:4px 10px; border-radius:999px; color:#fff; font-size:12px; font-weight:700; letter-spacing:.3px; }
+    .post-content { margin:12px 0 10px; white-space: pre-wrap; }
+    .post-images { display:grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); gap:8px; }
+    .post-image { width:100%; height:120px; object-fit:cover; border-radius:12px; cursor:pointer; }
+    .post-actions { display:flex; align-items:center; gap:12px; margin-top:10px; }
+    .action-btn { background:transparent; border:1px solid rgba(0,0,0,.1); padding:6px 10px; border-radius:10px; cursor:pointer; }
+    .action-btn.liked { background:#fee2e2; border-color:#fecaca; }
+    .comment-count { color:var(--text-secondary); font-size:13px; }
+    .delete-btn { border-color: rgba(220,38,38,.3); color: var(--danger); }
+    .delete-btn:hover { background: rgba(220,38,38,.06); }
+
+    .comments-section { margin-top:10px; }
+    .comment { background:rgba(255,255,255,.7); border:1px solid rgba(0,0,0,.05); border-radius:12px; padding:10px 12px; margin-bottom:8px; }
+    .comment-header { display:flex; gap:10px; align-items:baseline; font-size:12px; color:var(--text-secondary); }
+    .comment-text { margin-top:6px; }
+    .comment-form { display:flex; gap:8px; margin-top:8px; }
+    .comment-input { flex:1; padding:10px 12px; border:1px solid rgba(0,0,0,.1); border-radius:10px; }
+    .comment-submit { border:none; padding:10px 14px; border-radius:10px; background:var(--accent-blue); color:#fff; font-weight:600; cursor:pointer; }
+
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.3); display:grid; place-items:center; z-index:200; }
+    .modal-content { width:min(720px,92vw); background:#fff; border-radius:16px; overflow:hidden; box-shadow:var(--shadow-lg); }
+    .modal-header { display:flex; align-items:center; justify-content:space-between; padding:16px 18px; border-bottom:1px solid #eee; }
+    .modal-title { font-size:18px; }
+    .modal-close { border:none; background:transparent; font-size:24px; cursor:pointer; }
+    .modal-body { padding:18px; }
+    .confirm-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:16px; }
+    .danger-btn { background:var(--danger); color:#fff; border:none; padding:10px 16px; border-radius:10px; cursor:pointer; }
+    .ghost-btn { background:#f3f4f6; border:none; padding:10px 16px; border-radius:10px; cursor:pointer; }
+
+    .lightbox { position:fixed; inset:0; background:rgba(0,0,0,.85); display:grid; grid-template-rows:auto 1fr; z-index:300; }
+    .lightbox-header { display:flex; justify-content:space-between; align-items:center; color:#fff; padding:12px 18px; }
+    .lightbox-content { display:grid; place-items:center; position:relative; }
+    .lightbox-image { max-width:92vw; max-height:72vh; border-radius:12px; }
+    .lightbox-nav { position:absolute; top:50%; transform:translateY(-50%); border:none; background:rgba(255,255,255,.15); color:#fff; font-size:28px; width:44px; height:44px; border-radius:999px; cursor:pointer; }
+    .lightbox-nav.prev { left:18px; } .lightbox-nav.next { right:18px; }
+
+    .trash-list { display:grid; gap:10px; }
+    .trash-item { display:grid; grid-template-columns: 1fr auto auto; gap:10px; align-items:center; border:1px solid #eee; border-radius:10px; padding:10px 12px; }
+    .small-muted { font-size:12px; color:var(--text-secondary); }
   </style>
 </head>
 <body>
@@ -7,7 +161,7 @@
     const { useState, useEffect, useCallback } = React;
 
     /* =========================
-       KONFIG - UPPDATERA MED DIN WEB APP URL
+       KONFIG
        ========================= */
     const API_URL = 'https://script.google.com/macros/s/AKfycbwNvIkwjD0-m32lT1RyM25zSC1CHkkUdR8Ra5Hvmoe0UM30oeBqRx3A4wvGzUsMJw/exec';
 
@@ -19,41 +173,46 @@
         const url = new URL(API_URL);
         url.searchParams.set('path', path);
         Object.entries(params).forEach(([k, v]) => {
-          if (v !== null && v !== undefined) {
-            url.searchParams.set(k, String(v));
-          }
+          if (v !== null && v !== undefined) url.searchParams.set(k, String(v));
         });
-        
         const res = await fetch(url.toString(), { method: 'GET', redirect: 'follow' });
         return await res.json();
       },
-      
       async post(path, data = {}) {
         const form = new URLSearchParams();
         form.set('path', path);
-        
         Object.entries(data).forEach(([k, v]) => {
-          if (v !== null && v !== undefined) {
-            form.append(k, String(v));
-          }
+          if (v !== null && v !== undefined) form.append(k, String(v));
         });
-        
-        const res = await fetch(API_URL, { 
-          method: 'POST', 
+        const res = await fetch(API_URL, {
+          method: 'POST',
           body: form,
           redirect: 'follow',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
         });
-        
         const responseText = await res.text();
         return JSON.parse(responseText);
       }
     };
 
     /* =========================
-       KOMPONENTER
+       UTIL: e-post → förnamn + validering
        ========================= */
+    const isKarlskogaEmail = (email) => {
+      if (!email) return false;
+      const e = String(email).trim().toLowerCase();
+      return e.endsWith('@karlskoga.se') && e.split('@')[0].includes('.');
+    };
+    const firstNameFromEmail = (email) => {
+      if (!email) return '';
+      const local = String(email).split('@')[0] || '';
+      const first = (local.split('.')[0] || local).replace(/[_-]+/g, ' ');
+      return first.charAt(0).toUpperCase() + first.slice(1).toLowerCase();
+    };
 
+    /* =========================
+       UI: Komponenter
+       ========================= */
     function Loader({ text = "Laddar..." }) {
       return (
         <div className="loader">
@@ -65,7 +224,6 @@
 
     function Modal({ isOpen, onClose, title, children }) {
       if (!isOpen) return null;
-
       return (
         <div className="modal-overlay" onClick={onClose}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -73,27 +231,29 @@
               <h2 className="modal-title">{title}</h2>
               <button className="modal-close" onClick={onClose}>×</button>
             </div>
-            <div className="modal-body">
-              {children}
-            </div>
+            <div className="modal-body">{children}</div>
           </div>
         </div>
+      );
+    }
+
+    function ConfirmModal({ isOpen, title = "Bekräfta", message, confirmText = "OK", cancelText = "Avbryt", onConfirm, onCancel }) {
+      return (
+        <Modal isOpen={isOpen} onClose={onCancel} title={title}>
+          <p>{message}</p>
+          <div className="confirm-actions">
+            <button className="ghost-btn" onClick={onCancel}>{cancelText}</button>
+            <button className="danger-btn" onClick={onConfirm}>{confirmText}</button>
+          </div>
+        </Modal>
       );
     }
 
     function ImageLightbox({ isOpen, images, index, onClose, onIndex }) {
       if (!isOpen || !images || images.length === 0) return null;
       const img = images[index] || images[0];
-
-      const prev = (e) => {
-        e?.stopPropagation();
-        onIndex((index - 1 + images.length) % images.length);
-      };
-
-      const next = (e) => {
-        e?.stopPropagation();
-        onIndex((index + 1) % images.length);
-      };
+      const prev = (e) => { e?.stopPropagation(); onIndex((index - 1 + images.length) % images.length); };
+      const next = (e) => { e?.stopPropagation(); onIndex((index + 1) % images.length); };
 
       return (
         <div className="lightbox" onClick={onClose}>
@@ -102,12 +262,7 @@
             <button className="lightbox-close" onClick={onClose}>×</button>
           </div>
           <div className="lightbox-content">
-            <img
-              src={img.directUrl || img.thumbnailUrl}
-              alt=""
-              className="lightbox-image"
-              onClick={(e) => e.stopPropagation()}
-            />
+            <img src={img.directUrl || img.thumbnailUrl} alt="" className="lightbox-image" onClick={(e) => e.stopPropagation()} />
             {images.length > 1 && (
               <>
                 <button className="lightbox-nav prev" onClick={prev}>‹</button>
@@ -131,10 +286,14 @@
 
       const requestOTP = async (e) => {
         e.preventDefault();
-        setLoading(true);
-        setError('');
+        const normalized = (email || '').trim().toLowerCase();
+        if (!isKarlskogaEmail(normalized)) {
+          setError('Ange en giltig @karlskoga.se-adress i formatet förnamn.efternamn@karlskoga.se');
+          return;
+        }
+        setLoading(true); setError('');
         try {
-          const res = await api.post('auth/request-otp', { email });
+          const res = await api.post('auth/request-otp', { email: normalized });
           if (!res.success) throw new Error(res.error || 'Kunde inte skicka kod');
           setOtpSent(true);
         } catch (err) {
@@ -146,12 +305,16 @@
 
       const verifyOTP = async (e) => {
         e.preventDefault();
-        setLoading(true);
-        setError('');
+        setLoading(true); setError('');
         try {
-          const res = await api.post('auth/verify-otp', { email, code: otp });
+          const normalized = (email || '').trim().toLowerCase();
+          const res = await api.post('auth/verify-otp', { email: normalized, code: otp });
           if (!res.success) throw new Error(res.error || 'Ogiltig kod');
-          onLogin({ email: res.email, sessionToken: res.sessionToken });
+          onLogin({
+            email: res.email,
+            sessionToken: res.sessionToken,
+            displayName: res.displayName || firstNameFromEmail(res.email),
+          });
         } catch (err) {
           setError(err.message);
         } finally {
@@ -174,26 +337,20 @@
                   <input
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => setEmail(e.target.value.trim().toLowerCase())}
                     className="form-input"
-                    placeholder="ditt.namn@karlskoga.se"
+                    placeholder="fornamn.efternamn@karlskoga.se"
                     required
                   />
                 </div>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="primary-btn"
-                >
+                <button type="submit" disabled={loading} className="primary-btn">
                   {loading ? 'Skickar...' : 'Skicka inloggningskod'}
                 </button>
               </form>
             ) : (
               <form onSubmit={verifyOTP} className="login-form">
                 {error && <div className="error-message">{error}</div>}
-                <div className="success-message">
-                  Kod skickad till {email}
-                </div>
+                <div className="success-message">Kod skickad till {email}</div>
                 <div className="form-group">
                   <label className="form-label">Ange kod</label>
                   <input
@@ -206,18 +363,10 @@
                     required
                   />
                 </div>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="primary-btn"
-                >
+                <button type="submit" disabled={loading} className="primary-btn">
                   {loading ? 'Verifierar...' : 'Logga in'}
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setOtpSent(false)}
-                  className="secondary-btn"
-                >
+                <button type="button" onClick={() => setOtpSent(false)} className="secondary-btn">
                   Skicka ny kod
                 </button>
               </form>
@@ -269,12 +418,7 @@
                 placeholder="Filtrera på användare..."
               />
             </div>
-            <button
-              onClick={onClear}
-              className="clear-btn"
-            >
-              Rensa
-            </button>
+            <button onClick={onClear} className="clear-btn">Rensa</button>
           </div>
         </div>
       );
@@ -291,20 +435,14 @@
       const [categories, setCategories] = useState([]);
       const [loading, setLoading] = useState(false);
       const [error, setError] = useState('');
-      const [showCreateCategory, setShowCreateCategory] = useState(false);
 
-      useEffect(() => {
-        if (isOpen) {
-          loadCategories();
-        }
-      }, [isOpen]);
+      useEffect(() => { if (isOpen) loadCategories(); }, [isOpen]);
 
       const loadCategories = async () => {
         try {
-          const res = await api.get('categories');
-          if (res.success) {
-            setCategories(res.categories || []);
-          }
+          // ✅ Skicka med session!
+          const res = await api.get('categories', { session: session.sessionToken });
+          if (res.success) setCategories(res.categories || []);
         } catch (err) {
           console.error('Kunde inte ladda kategorier:', err);
         }
@@ -312,29 +450,21 @@
 
       const readFileAsBase64 = (file) => new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.onload = () => {
-          const base64 = String(reader.result).split(',')[1];
-          resolve(base64);
-        };
+        reader.onload = () => resolve(String(reader.result).split(',')[1]);
         reader.onerror = reject;
         reader.readAsDataURL(file);
       });
 
       const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
-        setError('');
+        setLoading(true); setError('');
         try {
           const uploads = await Promise.all((files || []).map(async (f) => {
             const base64 = await readFileAsBase64(f);
             return api.post('file/upload', {
-              session: session.sessionToken,
-              filename: f.name,
-              mimeType: f.type,
-              dataBase64: base64
+              session: session.sessionToken, filename: f.name, mimeType: f.type, dataBase64: base64
             });
           }));
-          
           const fileIds = uploads.map(up => {
             if (!up.success) throw new Error(up.error || 'Uppladdning misslyckades');
             return up.fileId;
@@ -342,51 +472,29 @@
 
           const result = await api.post('post/create', {
             session: session.sessionToken,
-            title,
-            text,
-            categoryId,
+            title, text, categoryId,
             imageFileIds: fileIds.join(',')
           });
-          
           if (!result.success) throw new Error(result.error || 'Kunde inte skapa inlägg');
 
-          setTitle('');
-          setText('');
-          setCategoryId('general');
-          setFiles([]);
-          onSuccess && onSuccess();
-          onClose();
+          setTitle(''); setText(''); setCategoryId('general'); setFiles([]);
+          onSuccess && onSuccess(); onClose();
         } catch (err) {
           setError(err.message);
-        } finally {
-          setLoading(false);
-        }
+        } finally { setLoading(false); }
       };
 
       const createCategory = async () => {
-        const name = prompt('Ange kategorinamn:');
-        if (!name) return;
-        
+        const name = prompt('Ange kategorinamn:'); if (!name) return;
         const description = prompt('Beskrivning (valfritt):') || '';
         const color = '#' + Math.floor(Math.random()*16777215).toString(16);
-        
         try {
           const res = await api.post('category/create', {
-            session: session.sessionToken,
-            name,
-            description,
-            color
+            session: session.sessionToken, name, description, color
           });
-          
-          if (res.success) {
-            await loadCategories();
-            setCategoryId(res.categoryId);
-          } else {
-            alert('Kunde inte skapa kategori: ' + (res.error || 'Okänt fel'));
-          }
-        } catch (err) {
-          alert('Fel: ' + err.message);
-        }
+          if (res.success) { await loadCategories(); setCategoryId(res.categoryId); }
+          else alert('Kunde inte skapa kategori: ' + (res.error || 'Okänt fel'));
+        } catch (err) { alert('Fel: ' + err.message); }
       };
 
       return (
@@ -395,78 +503,40 @@
           <form onSubmit={handleSubmit} className="create-post-form">
             <div className="form-group">
               <label className="form-label">Titel</label>
-              <input
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="form-input"
-                placeholder="Ange en beskrivande titel..."
-                required
-              />
+              <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} className="form-input" placeholder="Ange en beskrivande titel..." required />
             </div>
-            
-            <div className="form-row">
+
+            <div className="form-row" style={{display:'flex', gap:'12px', alignItems:'end'}}>
               <div className="form-group">
                 <label className="form-label">Kategori</label>
-                <select
-                  value={categoryId}
-                  onChange={(e) => setCategoryId(e.target.value)}
-                  className="filter-select"
-                >
-                  {categories.map(cat => (
-                    <option key={cat.category_id} value={cat.category_id}>
-                      {cat.name}
-                    </option>
-                  ))}
+                <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} className="filter-select">
+                  {categories.map(cat => <option key={cat.category_id} value={cat.category_id}>{cat.name}</option>)}
                 </select>
               </div>
-              <button
-                type="button"
-                onClick={createCategory}
-                className="create-category-btn"
-              >
-                + Ny kategori
-              </button>
+              <button type="button" onClick={createCategory} className="pill-btn">+ Ny kategori</button>
             </div>
-            
+
             <div className="form-group">
               <label className="form-label">Innehåll</label>
               <textarea
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                className="textarea-field"
+                className="form-input"
+                style={{ minHeight: 120 }}  /* ✅ FIX: style som objekt */
                 placeholder="Beskriv vad som händer..."
                 required
               />
             </div>
+
             <div className="form-group">
               <label className="form-label">Bilder (valfritt)</label>
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={(e) => setFiles(Array.from(e.target.files || []))}
-                className="file-input"
-              />
-              {files.length > 0 && (
-                <div className="file-count">{files.length} fil(er) valda</div>
-              )}
+              <input type="file" accept="image/*" multiple onChange={(e) => setFiles(Array.from(e.target.files || []))} className="file-input" />
+              {files.length > 0 && <div className="small-muted">{files.length} fil(er) valda</div>}
             </div>
-            <div className="form-actions">
-              <button
-                type="button"
-                onClick={onClose}
-                className="secondary-button"
-              >
-                Avbryt
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="primary-btn"
-              >
-                {loading ? 'Publicerar...' : 'Publicera'}
-              </button>
+
+            <div className="form-actions" style={{display:'flex', justifyContent:'flex-end', gap:'12px', marginTop:'10px'}}>
+              <button type="button" onClick={onClose} className="ghost-btn">Avbryt</button>
+              <button type="submit" disabled={loading} className="primary-btn">{loading ? 'Publicerar...' : 'Publicera'}</button>
             </div>
           </form>
         </Modal>
@@ -482,16 +552,14 @@
       const [busy, setBusy] = useState(false);
 
       const load = useCallback(async () => {
-        const res = await api.get('post/reactions', { postId: post.post_id });
+        const res = await api.get('post/reactions', { postId: post.post_id, session: session.sessionToken });
         if (res.success) {
           setCount((res.counts && res.counts.like) || 0);
           setHasLiked((res.reactions || []).some(r => r.userEmail === session.email && r.type === 'like'));
         }
-      }, [post.post_id, session.email]);
+      }, [post.post_id, session.email, session.sessionToken]);
 
-      useEffect(() => {
-        load();
-      }, [load]);
+      useEffect(() => { load(); }, [load]);
 
       const toggle = async () => {
         setBusy(true);
@@ -503,17 +571,11 @@
           }
           await load();
           onUpdate && onUpdate();
-        } finally {
-          setBusy(false);
-        }
+        } finally { setBusy(false); }
       };
 
       return (
-        <button
-          onClick={toggle}
-          disabled={busy}
-          className={`action-btn ${hasLiked ? 'liked' : ''}`}
-        >
+        <button onClick={toggle} disabled={busy} className={`action-btn ${hasLiked ? 'liked' : ''}`}>
           {hasLiked ? '❤️' : '♡'} {count}
         </button>
       );
@@ -526,23 +588,18 @@
 
       const load = async () => {
         setLoading(true);
-        const res = await api.get('post/comments', { postId });
+        const res = await api.get('post/comments', { postId, session: session.sessionToken });
         if (res.success) setItems(res.comments || []);
         setLoading(false);
       };
 
-      useEffect(() => {
-        load();
-      }, [postId]);
+      useEffect(() => { load(); }, [postId]);
 
       const submit = async (e) => {
         e.preventDefault();
         if (!text.trim()) return;
         const res = await api.post('post/comment/add', { session: session.sessionToken, postId, text });
-        if (res.success) {
-          setText('');
-          load();
-        }
+        if (res.success) { setText(''); load(); }
       };
 
       return (
@@ -556,7 +613,9 @@
               {items.map(c => (
                 <div key={c.comment_id} className="comment">
                   <div className="comment-header">
-                    <span className="comment-author">{c.user_email}</span>
+                    <span className="comment-author" title={c.user_email}>
+                      {firstNameFromEmail(c.user_email)}
+                    </span>
                     <span className="comment-date">
                       {new Date(c.created_at).toLocaleString('sv-SE')}
                     </span>
@@ -573,14 +632,76 @@
               placeholder="Skriv en kommentar..."
               className="comment-input"
             />
-            <button
-              type="submit"
-              className="comment-submit"
-            >
-              Skicka
-            </button>
+            <button type="submit" className="comment-submit">Skicka</button>
           </form>
         </div>
+      );
+    }
+
+    /* =========================
+       PAPPERSKORG
+       ========================= */
+    function TrashModal({ isOpen, onClose, session, onChanged }) {
+      const [loading, setLoading] = useState(true);
+      const [items, setItems] = useState([]);
+      const [error, setError] = useState('');
+
+      const loadTrash = async () => {
+        setLoading(true); setError('');
+        try {
+          const res = await api.get('posts/trash', { session: session.sessionToken });
+          if (!res.success) throw new Error(res.error || 'Kunde inte hämta papperskorg');
+          setItems(res.posts || []);
+        } catch (err) {
+          setError(err.message);
+        } finally { setLoading(false); }
+      };
+
+      useEffect(() => { if (isOpen) loadTrash(); }, [isOpen]);
+
+      const restore = async (postId) => {
+        try {
+          const res = await api.post('post/restore', { session: session.sessionToken, postId });
+          if (!res.success) throw new Error(res.error || 'Kunde inte återställa');
+          await loadTrash();
+          onChanged && onChanged();
+        } catch (err) { alert(err.message); }
+      };
+
+      const purge = async (postId) => {
+        if (!confirm('Radera permanent? Detta går inte att ångra.')) return;
+        try {
+          const res = await api.post('post/purge', { session: session.sessionToken, postId });
+          if (!res.success) throw new Error(res.error || 'Kunde inte radera permanent');
+          await loadTrash();
+          onChanged && onChanged();
+        } catch (err) { alert(err.message); }
+      };
+
+      return (
+        <Modal isOpen={isOpen} onClose={onClose} title="Papperskorg">
+          {error && <div className="error-message">{error}</div>}
+          {loading ? (
+            <Loader text="Hämtar papperskorg..." />
+          ) : items.length === 0 ? (
+            <div className="loader-text">Papperskorgen är tom.</div>
+          ) : (
+            <div className="trash-list">
+              {items.map(p => (
+                <div key={p.post_id} className="trash-item">
+                  <div>
+                    <div><strong>{p.title}</strong></div>
+                    <div className="small-muted">
+                      Av {firstNameFromEmail(p.author_email)} • {new Date(p.deleted_at || p.created_at).toLocaleString('sv-SE')}
+                    </div>
+                  </div>
+                  <button className="pill-btn" onClick={() => restore(p.post_id)}>Återställ</button>
+                  <button className="pill-btn delete-btn" onClick={() => purge(p.post_id)}>Radera permanent</button>
+                </div>
+              ))}
+            </div>
+          )}
+        </Modal>
       );
     }
 
@@ -595,8 +716,11 @@
       const [lightboxOpen, setLightboxOpen] = useState(false);
       const [lightboxImages, setLightboxImages] = useState([]);
       const [lightboxIndex, setLightboxIndex] = useState(0);
-      
-      // Sök och filter state
+
+      const [showTrash, setShowTrash] = useState(false);
+      const [confirmOpen, setConfirmOpen] = useState(false);
+      const [postToDelete, setPostToDelete] = useState(null);
+
       const [searchQuery, setSearchQuery] = useState('');
       const [categoryFilter, setCategoryFilter] = useState('all');
       const [authorFilter, setAuthorFilter] = useState('');
@@ -605,7 +729,7 @@
       const loadPosts = async () => {
         setLoading(true);
         try {
-          const res = await api.get('posts/search', { 
+          const res = await api.get('posts/search', {
             session: session.sessionToken,
             search: searchQuery,
             category: categoryFilter === 'all' ? '' : categoryFilter,
@@ -617,76 +741,66 @@
           }
         } catch (err) {
           console.error('Kunde inte ladda inlägg:', err);
-        } finally {
-          setLoading(false);
-        }
+        } finally { setLoading(false); }
       };
 
       const loadCategories = async () => {
         try {
-          const res = await api.get('categories');
-          if (res.success) {
-            setCategories(res.categories || []);
-          }
+          // ✅ Skicka med session!
+          const res = await api.get('categories', { session: session.sessionToken });
+          if (res.success) setCategories(res.categories || []);
         } catch (err) {
           console.error('Kunde inte ladda kategorier:', err);
         }
       };
 
+      useEffect(() => { loadCategories(); }, []);
       useEffect(() => {
-        loadCategories();
-      }, []);
-
-      useEffect(() => {
-        const timeoutId = setTimeout(() => {
-          loadPosts();
-        }, 300); // Debounce search
-        
+        const timeoutId = setTimeout(() => { loadPosts(); }, 300);
         return () => clearTimeout(timeoutId);
       }, [searchQuery, categoryFilter, authorFilter]);
 
       const openLightbox = (images, idx = 0) => {
-        setLightboxImages(images || []);
-        setLightboxIndex(idx || 0);
-        setLightboxOpen(true);
+        setLightboxImages(images || []); setLightboxIndex(idx || 0); setLightboxOpen(true);
       };
 
       const handleLogout = async () => {
-        try {
-          await api.post('auth/logout', { session: session.sessionToken });
-        } catch (err) {
-          console.error('Logout error:', err);
-        }
+        try { await api.post('auth/logout', { session: session.sessionToken }); }
+        catch (err) { console.error('Logout error:', err); }
         onLogout();
       };
 
-      const clearFilters = () => {
-        setSearchQuery('');
-        setCategoryFilter('all');
-        setAuthorFilter('');
-      };
-
+      const clearFilters = () => { setSearchQuery(''); setCategoryFilter('all'); setAuthorFilter(''); };
       const hasActiveFilters = searchQuery || categoryFilter !== 'all' || authorFilter;
+
+      const requestDelete = (post) => { setPostToDelete(post); setConfirmOpen(true); };
+      const doDelete = async () => {
+        if (!postToDelete) return;
+        setConfirmOpen(false);
+        try {
+          const res = await api.post('post/delete', { session: session.sessionToken, postId: postToDelete.post_id });
+          if (!res.success) throw new Error(res.error || 'Kunde inte radera (flytta till papperskorg)');
+          await loadPosts();
+        } catch (err) { alert(err.message); } finally { setPostToDelete(null); }
+      };
 
       return (
         <>
-          {/* Header */}
           <header className="glass-header">
-            <div className="logo-area">
+            <a className="logo-area" href="#">
               <img src="./hander_och_sker.png" alt="Karlskoga Portal" className="logo-img" />
               <span className="tagline">kommunikationsplatsen</span>
-            </div>
+            </a>
             <div className="user-info">
-              <span className="user-name">{session.email.split('@')[0]}</span>
-              <button onClick={handleLogout} className="logout-btn">
-                Logga ut
-              </button>
+              <button className="pill-btn" onClick={() => setShowTrash(true)} title="Visa papperskorg">Papperskorg</button>
+              <span className="user-name" title={session.email}>
+                {session.displayName || firstNameFromEmail(session.email)}
+              </span>
+              <button onClick={handleLogout} className="pill-btn logout-btn">Logga ut</button>
             </div>
           </header>
 
-          {/* Main Content */}
           <main className="main-container">
-            {/* Search and Filters */}
             <SearchFilters
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
@@ -698,107 +812,87 @@
               onClear={clearFilters}
             />
 
-            {/* Results count */}
             {hasActiveFilters && (
               <div className="results-count">
                 {loading ? 'Söker...' : `${resultCount} inlägg funna`}
               </div>
             )}
 
-            {/* Create Post Button */}
             {!hasActiveFilters && (
-              <div
-                className="create-post-card"
-                onClick={() => setShowCreatePost(true)}
-              >
+              <div className="create-post-card" onClick={() => setShowCreatePost(true)}>
                 <div className="create-post-prompt">
-                  Vad händer, {session.email.split('@')[0]}?
+                  Klicka för att göra ett inlägg, vad har du på gång {session.displayName || firstNameFromEmail(session.email)}?
                 </div>
               </div>
             )}
 
-            {/* Posts Feed */}
             {loading ? (
               <Loader text="Laddar inlägg..." />
             ) : posts.length === 0 ? (
               <div className="empty-state">
-                <div className="empty-state-text">
+                <div className="loader-text">
                   {hasActiveFilters ? 'Inga inlägg matchar dina sökkriterier.' : 'Inga inlägg ännu. Var den första att posta något!'}
                 </div>
               </div>
             ) : (
               <div className="posts-feed">
-                {posts.map(post => (
-                  <article key={post.post_id} className="post-card">
-                    {/* Post Header */}
-                    <div className="post-header">
-                      <div className="post-avatar">
-                        {(post.author_email || '?')[0].toUpperCase()}
-                      </div>
-                      <div className="post-meta">
-                        <h2 className="post-title">{post.title}</h2>
-                        <div className="post-author-info">
-                          <div className="post-author">
-                            {post.author_email}
-                          </div>
-                          <div className="post-date">
-                            {new Date(post.created_at).toLocaleString('sv-SE')}
-                          </div>
-                          {post.category && (
-                            <div 
-                              className="category-badge"
-                              style={{ backgroundColor: post.category.color || '#6B7280' }}
-                            >
-                              {post.category.name}
+                {posts.map(post => {
+                  const isAuthor = (post.author_email || '').toLowerCase() === (session.email || '').toLowerCase();
+                  return (
+                    <article key={post.post_id} className="post-card">
+                      <div className="post-header">
+                        <div className="post-avatar">{(post.author_email || '?')[0].toUpperCase()}</div>
+                        <div className="post-meta" style={{flex:1}}>
+                          <h2 className="post-title">{post.title}</h2>
+                          <div className="post-author-info">
+                            <div className="post-author" title={post.author_email}>
+                              {firstNameFromEmail(post.author_email)}
                             </div>
-                          )}
+                            <div className="post-date">
+                              {new Date(post.created_at).toLocaleString('sv-SE')}
+                            </div>
+                            {post.category && (
+                              <div className="category-badge" style={{ backgroundColor: post.category.color || '#6B7280' }}>
+                                {post.category.name}
+                              </div>
+                            )}
+                          </div>
                         </div>
+                        {isAuthor && (
+                          <button className="pill-btn delete-btn" title="Flytta till papperskorg" onClick={() => requestDelete(post)}>
+                            Radera
+                          </button>
+                        )}
                       </div>
-                    </div>
 
-                    {/* Post Content */}
-                    <div className="post-content">{post.text}</div>
+                      <div className="post-content">{post.text}</div>
 
-                    {/* Images */}
-                    {post.images && post.images.length > 0 && (
-                      <div className="post-images">
-                        {post.images.map((img, i) => (
-                          <img
-                            key={i}
-                            src={img.thumbnailUrl || img.directUrl}
-                            alt="Bild"
-                            className="post-image"
-                            onClick={() => openLightbox(post.images, i)}
-                          />
-                        ))}
+                      {post.images && post.images.length > 0 && (
+                        <div className="post-images">
+                          {post.images.map((img, i) => (
+                            <img key={i} src={img.thumbnailUrl || img.directUrl} alt="Bild" className="post-image" onClick={() => openLightbox(post.images, i)} />
+                          ))}
+                        </div>
+                      )}
+
+                      <div className="post-actions">
+                        <ReactionBar post={post} session={session} />
+                        <span className="comment-count">{post.comments_count || 0} kommentarer</span>
                       </div>
-                    )}
 
-                    {/* Actions */}
-                    <div className="post-actions">
-                      <ReactionBar post={post} session={session} />
-                      <span className="comment-count">
-                        {post.comments_count || 0} kommentarer
-                      </span>
-                    </div>
-
-                    {/* Comments */}
-                    <Comments postId={post.post_id} session={session} />
-                  </article>
-                ))}
+                      <Comments postId={post.post_id} session={session} />
+                    </article>
+                  );
+                })}
               </div>
             )}
           </main>
 
-          {/* Modals */}
           <CreatePostModal
             isOpen={showCreatePost}
             onClose={() => setShowCreatePost(false)}
             session={session}
-            onSuccess={() => {
-              loadPosts();
-              loadCategories(); // Uppdatera kategorier om ny skapades
-            }}
+            onSuccess={() => { loadPosts(); loadCategories(); }}
           />
 
           <ImageLightbox
@@ -808,12 +902,29 @@
             onClose={() => setLightboxOpen(false)}
             onIndex={setLightboxIndex}
           />
+
+          <TrashModal
+            isOpen={showTrash}
+            onClose={() => setShowTrash(false)}
+            session={session}
+            onChanged={() => loadPosts()}
+          />
+
+          <ConfirmModal
+            isOpen={confirmOpen}
+            title="Radera inlägg?"
+            message="Vill du verkligen radera inlägget? Det flyttas till papperskorgen och kan återställas."
+            confirmText="Ja, radera"
+            cancelText="Avbryt"
+            onConfirm={doDelete}
+            onCancel={() => { setConfirmOpen(false); setPostToDelete(null); }}
+          />
         </>
       );
     }
 
     /* =========================
-       HUVUDAPP
+       APP
        ========================= */
     function App() {
       const [session, setSession] = useState(null);
@@ -822,11 +933,8 @@
       useEffect(() => {
         const saved = localStorage.getItem('karlskoga_session');
         if (saved) {
-          try {
-            setSession(JSON.parse(saved));
-          } catch (err) {
-            localStorage.removeItem('karlskoga_session');
-          }
+          try { setSession(JSON.parse(saved)); }
+          catch { localStorage.removeItem('karlskoga_session'); }
         }
         setLoading(false);
       }, []);
@@ -841,14 +949,8 @@
         localStorage.removeItem('karlskoga_session');
       };
 
-      if (loading) {
-        return <Loader text="Startar..." />;
-      }
-
-      if (!session) {
-        return <LoginPage onLogin={onLogin} />;
-      }
-
+      if (loading) return <Loader text="Startar..." />;
+      if (!session) return <LoginPage onLogin={onLogin} />;
       return <MainPage session={session} onLogout={onLogout} />;
     }
 
@@ -856,426 +958,4 @@
     root.render(<App />);
   </script>
 </body>
-</html><!DOCTYPE html>
-<html lang="sv">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Karlskoga Portal</title>
-  <meta name="description" content="En gemensam kommunikationsplats för medarbetare på Karlskoga kommun" />
-  <meta name="theme-color" content="#F5F7FA" />
-
-  <!-- React + Babel UMD -->
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    :root {
-      --bg-primary: #F5F7FA;
-      --bg-gradient-1: #E8ECFF;
-      --bg-gradient-2: #F0F4FF;
-      --glass-bg: rgba(255, 255, 255, 0.7);
-      --glass-border: rgba(255, 255, 255, 0.9);
-      --text-primary: #1D1D1F;
-      --text-secondary: #6E6E73;
-      --accent-blue: #5863C7;
-      --accent-purple: #7B68EE;
-      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-      --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.08);
-      --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.12);
-    }
-    
-    body { 
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-      background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 100%);
-      min-height: 100vh;
-      color: var(--text-primary);
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-      position: relative;
-      overflow-x: hidden;
-    }
-
-    /* Animated background orbs */
-    body::before,
-    body::after {
-      content: '';
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(80px);
-      opacity: 0.15;
-      z-index: 0;
-      animation: float 20s ease-in-out infinite;
-    }
-    
-    body::before {
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, var(--accent-blue) 0%, transparent 70%);
-      top: -200px;
-      right: -200px;
-      animation-delay: 0s;
-    }
-    
-    body::after {
-      width: 500px;
-      height: 500px;
-      background: radial-gradient(circle, var(--accent-purple) 0%, transparent 70%);
-      bottom: -150px;
-      left: -150px;
-      animation-delay: -10s;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      33% { transform: translate(50px, -50px) scale(1.1); }
-      66% { transform: translate(-30px, 30px) scale(0.9); }
-    }
-
-    /* Glass Header */
-    .glass-header {
-      position: sticky;
-      top: 20px;
-      max-width: 1200px;
-      margin: 20px auto;
-      padding: 16px 32px;
-      background: var(--glass-bg);
-      backdrop-filter: blur(20px) saturate(180%);
-      -webkit-backdrop-filter: blur(20px) saturate(180%);
-      border: 1px solid var(--glass-border);
-      border-radius: 20px;
-      box-shadow: var(--shadow-md);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      z-index: 100;
-      transition: all 0.3s ease;
-    }
-
-    .glass-header:hover {
-      box-shadow: var(--shadow-lg);
-      transform: translateY(-2px);
-    }
-
-    .logo-area {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      text-decoration: none;
-    }
-
-    .logo-img {
-      height: 40px;
-      transition: transform 0.3s ease;
-    }
-
-    .logo-area:hover .logo-img {
-      transform: scale(1.05);
-    }
-
-    .tagline {
-      font-size: 15px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      letter-spacing: -0.2px;
-    }
-
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .user-name {
-      font-size: 14px;
-      color: var(--text-secondary);
-    }
-
-    .logout-btn {
-      background: transparent;
-      color: var(--text-secondary);
-      border: 1px solid rgba(0, 0, 0, 0.1);
-      padding: 8px 16px;
-      border-radius: 12px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .logout-btn:hover {
-      color: #dc2626;
-      border-color: rgba(220, 38, 38, 0.3);
-      background: rgba(220, 38, 38, 0.05);
-    }
-
-    /* Login Page */
-    .login-container {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 32px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .login-card {
-      background: var(--glass-bg);
-      backdrop-filter: blur(20px) saturate(180%);
-      -webkit-backdrop-filter: blur(20px) saturate(180%);
-      border: 1px solid var(--glass-border);
-      border-radius: 32px;
-      padding: 60px 50px;
-      box-shadow: var(--shadow-lg);
-      text-align: center;
-      max-width: 500px;
-      width: 100%;
-      transition: all 0.3s ease;
-    }
-
-    .login-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.15);
-    }
-
-    .login-logo {
-      height: 120px;
-      margin-bottom: 32px;
-      filter: drop-shadow(0 10px 40px rgba(0, 0, 0, 0.1));
-    }
-
-    .login-title {
-      font-size: 32px;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 12px;
-      letter-spacing: -1px;
-    }
-
-    .login-subtitle {
-      font-size: 16px;
-      color: var(--text-secondary);
-      margin-bottom: 40px;
-    }
-
-    .login-form {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .form-group {
-      text-align: left;
-    }
-
-    .form-label {
-      display: block;
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: var(--text-primary);
-      font-size: 14px;
-    }
-
-    .form-input {
-      width: 100%;
-      padding: 16px 20px;
-      border: 1px solid rgba(0, 0, 0, 0.1);
-      border-radius: 16px;
-      font-size: 16px;
-      background: rgba(255, 255, 255, 0.8);
-      transition: all 0.3s ease;
-      font-family: inherit;
-    }
-
-    .form-input:focus {
-      outline: none;
-      border-color: var(--accent-blue);
-      background: rgba(255, 255, 255, 0.95);
-      box-shadow: 0 0 0 3px rgba(88, 99, 199, 0.1);
-    }
-
-    .form-input.otp-input {
-      text-align: center;
-      font-size: 24px;
-      letter-spacing: 4px;
-      font-weight: 600;
-    }
-
-    .primary-btn {
-      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
-      color: white;
-      border: none;
-      padding: 16px 32px;
-      border-radius: 16px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 8px 24px rgba(88, 99, 199, 0.3);
-    }
-
-    .primary-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 32px rgba(123, 104, 238, 0.4);
-    }
-
-    .primary-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .secondary-btn {
-      background: transparent;
-      color: var(--text-secondary);
-      border: none;
-      padding: 12px;
-      font-size: 14px;
-      cursor: pointer;
-      transition: color 0.3s ease;
-    }
-
-    .secondary-btn:hover {
-      color: var(--accent-blue);
-    }
-
-    .success-message {
-      background: linear-gradient(135deg, #D4F4E7 0%, #C0F0DC 100%);
-      color: #0A7D52;
-      padding: 16px 20px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    .error-message {
-      background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
-      color: #DC2626;
-      padding: 16px 20px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    /* Main Container */
-    .main-container {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 0 32px 80px;
-      position: relative;
-      z-index: 1;
-    }
-
-    /* Search and Filters */
-    .search-filters {
-      background: var(--glass-bg);
-      backdrop-filter: blur(20px) saturate(180%);
-      border: 1px solid var(--glass-border);
-      border-radius: 24px;
-      padding: 24px;
-      box-shadow: var(--shadow-sm);
-      margin-bottom: 32px;
-      transition: all 0.3s ease;
-    }
-
-    .search-filters:hover {
-      background: rgba(255, 255, 255, 0.85);
-      box-shadow: var(--shadow-md);
-    }
-
-    .search-row {
-      display: grid;
-      grid-template-columns: 1fr auto auto;
-      gap: 16px;
-      align-items: end;
-    }
-
-    .search-input {
-      padding: 12px 16px;
-      border: 1px solid rgba(0, 0, 0, 0.1);
-      border-radius: 12px;
-      font-size: 14px;
-      background: rgba(255, 255, 255, 0.8);
-      transition: all 0.3s ease;
-    }
-
-    .search-input:focus {
-      outline: none;
-      border-color: var(--accent-blue);
-      background: rgba(255, 255, 255, 0.95);
-      box-shadow: 0 0 0 2px rgba(88, 99, 199, 0.1);
-    }
-
-    .filter-select {
-      padding: 12px 16px;
-      border: 1px solid rgba(0, 0, 0, 0.1);
-      border-radius: 12px;
-      font-size: 14px;
-      background: rgba(255, 255, 255, 0.8);
-      cursor: pointer;
-      min-width: 150px;
-    }
-
-    .clear-btn {
-      background: var(--accent-blue);
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 12px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .clear-btn:hover {
-      background: var(--accent-purple);
-    }
-
-    .results-count {
-      text-align: center;
-      color: var(--text-secondary);
-      font-size: 14px;
-      margin-bottom: 24px;
-    }
-
-    /* Create Post */
-    .create-post-card {
-      background: var(--glass-bg);
-      backdrop-filter: blur(20px) saturate(180%);
-      -webkit-backdrop-filter: blur(20px) saturate(180%);
-      border: 1px solid var(--glass-border);
-      border-radius: 24px;
-      padding: 24px;
-      box-shadow: var(--shadow-sm);
-      margin-bottom: 32px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .create-post-card:hover {
-      background: rgba(255, 255, 255, 0.85);
-      box-shadow: var(--shadow-md);
-      transform: translateY(-2px);
-    }
-
-    .create-post-prompt {
-      color: var(--text-secondary);
-      font-size: 16px;
-      text-align: left;
-    }
-
-    /* Posts Feed */
-    .posts-feed {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-    }
-
-    .post-card {
-      background: var(--glass-bg);
+</html>
