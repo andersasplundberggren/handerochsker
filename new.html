@@ -144,9 +144,9 @@
     const { useState, useEffect, useCallback } = React;
 
     /* ===== KONFIG ===== */
-    const API_URL = 'https://script.google.com/macros/s/AKfycbyDiliYJiLiFuJuMKfJuCLjXL8Tul98xzO_N7RnnB_8oQeECkEdxjBdxIXyVd916MQ/exec'; // <— BYT TILL DIN URL
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyDiliYJiLiFuJuMKfJuCLjXL8Tul98xzO_N7RnnB_8oQeECkEdxjBdxIXyVd916MQ/exec';
 
-    /* ===== API ===== */
+    /* ===== API (med felsökningsloggar) ===== */
     const api = {
       async get(path, params = {}) {
         const url = new URL(API_URL);
@@ -155,7 +155,14 @@
           if (v !== null && v !== undefined) url.searchParams.set(k, String(v));
         });
         const res = await fetch(url.toString(), { method: 'GET', redirect: 'follow' });
-        return await res.json();
+        const text = await res.text();
+        let json;
+        try { json = JSON.parse(text); } catch {
+          console.warn('GET non-JSON', { path, text });
+          throw new Error('API svarade inte med JSON');
+        }
+        if (!json.success) console.warn('GET fail', { path, params, json });
+        return json;
       },
       async post(path, data = {}) {
         const form = new URLSearchParams();
@@ -169,8 +176,14 @@
           redirect: 'follow',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
         });
-        const t = await res.text();
-        try { return JSON.parse(t); } catch { return { success:false, error:t }; }
+        const text = await res.text();
+        let json;
+        try { json = JSON.parse(text); } catch {
+          console.warn('POST non-JSON', { path, text });
+          throw new Error('API svarade inte med JSON');
+        }
+        if (!json.success) console.warn('POST fail', { path, data, json });
+        return json;
       }
     };
 
@@ -191,21 +204,11 @@
     /* ===== FUN LOADER (randomiserad) ===== */
     function FunLoader({ interval=1400 }) {
       const lines = [
-        'Brygger idékaffe…',
-        'Slipar på lösningen…',
-        'Vässar post-it-pennorna…',
-        'Kalibrerar innovationskompassen…',
-        'Trycker på stora gröna knappen…',
-        'Sätter på kreativitetshjälmen…',
-        'Plockar fram aha-upplevelser…',
-        'Sparkar igång prototypmaskinen…',
-        'Mäter två gånger, lanserar en…',
-        'Limmar fast nyttoeffekt…',
-        'Skruvar i förbättringsskruven…',
-        'Drar idékablar i kanaler…',
-        'Sätter fogkryss mellan förslag…',
-        'Tömmer feedback-lådan…',
-        'Sätter på skyddsglasögon för wow…'
+        'Brygger idékaffe…','Slipar på lösningen…','Vässar post-it-pennorna…','Kalibrerar innovationskompassen…',
+        'Trycker på stora gröna knappen…','Sätter på kreativitetshjälmen…','Plockar fram aha-upplevelser…',
+        'Sparkar igång prototypmaskinen…','Mäter två gånger, lanserar en…','Limmar fast nyttoeffekt…',
+        'Skruvar i förbättringsskruven…','Drar idékablar i kanaler…','Sätter fogkryss mellan förslag…',
+        'Tömmer feedback-lådan…','Sätter på skyddsglasögon för wow…'
       ];
       const [i,setI] = useState(() => Math.floor(Math.random()*lines.length));
       useEffect(() => { const id = setInterval(()=>setI(x => (x+1)%lines.length), interval); return ()=>clearInterval(id); }, [interval]);
@@ -362,9 +365,13 @@
       useEffect(()=>{ if(isOpen) loadCategories(); },[isOpen]);
 
       const loadCategories = async () => {
-        try { const res = await api.get('categories', { session: session.sessionToken });
+        try {
+          const res = await api.get('categories', { session: session.sessionToken });
           if (res.success) setCategories(res.categories || []);
-        } catch(e){ /* ignore */ }
+          else setError(res.error || 'Kunde inte hämta kategorier');
+        } catch(e){
+          setError('Kunde inte hämta kategorier');
+        }
       };
 
       const readFileAsBase64 = (file) => new Promise((resolve,reject)=>{
@@ -376,6 +383,7 @@
 
       const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!summary.trim()) { setError('Sammanfattning krävs (max 140 tecken)'); return; }
         setLoading(true); setError('');
         try {
           // Ladda upp ev. bilder
@@ -388,7 +396,7 @@
             return up.fileId;
           });
 
-          // Skapa inlägg — skickar även summary om backend stödjer det
+          // Skapa inlägg
           const result = await api.post('post/create',{
             session: session.sessionToken,
             title, summary, text, categoryId,
@@ -435,7 +443,7 @@
 
             <div className="form-group">
               <label className="form-label">Sammanfattning (max 140 tecken)</label>
-              <input type="text" className="form-input" value={summary} onChange={(e)=>setSummary(clamp(e.target.value, 140))} placeholder="Kort teaser till startsidan…" />
+              <input type="text" className="form-input" value={summary} onChange={(e)=>setSummary(clamp(e.target.value, 140))} placeholder="Kort teaser till startsidan…" required />
               <div className="charline"><span>Förhandsvisas på startsidan</span><span>{left} tecken kvar</span></div>
             </div>
 
@@ -638,7 +646,6 @@
       };
 
       const summaryOf = (p)=>{
-        // använd sparad summary om den finns, annars autogenerera från text
         const s = (p.summary && String(p.summary).trim()) || '';
         if (s) return clamp(s, 140);
         return clamp(String(p.text||''), 140);
