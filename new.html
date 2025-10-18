@@ -25,9 +25,11 @@
       --accent-blue: #5863C7;
       --accent-purple: #7B68EE;
       --danger: #DC2626;
-      --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
-      --shadow-md: 0 8px 32px rgba(0,0,0,0.08);
-      --shadow-lg: 0 20px 60px rgba(0,0,0,0.12);
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+      --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.12);
+      --skeleton: #eef1f7;
+      --skeleton-shimmer: #ffffff;
     }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
@@ -89,7 +91,7 @@
     .loader { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; padding:40px; }
     .spinner { width:28px; height:28px; border-radius:50%; border:3px solid rgba(0,0,0,.1); border-top-color: var(--accent-blue); animation: spin .8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .loader-text { color:var(--text-secondary); font-size:14px; }
+    .loader-text { color:var(--text-secondary); font-size:14px; text-align:center; }
 
     .main-container { max-width:900px; margin:0 auto; padding:0 32px 80px; position:relative; z-index:1; }
 
@@ -152,6 +154,46 @@
     .trash-list { display:grid; gap:10px; }
     .trash-item { display:grid; grid-template-columns: 1fr auto auto; gap:10px; align-items:center; border:1px solid #eee; border-radius:10px; padding:10px 12px; }
     .small-muted { font-size:12px; color:var(--text-secondary); }
+
+    /* Skeletons */
+    .skeleton-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      position: relative;
+    }
+    .skeleton-block {
+      background: var(--skeleton);
+      border-radius: 8px;
+      height: 12px;
+      margin: 8px 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .skeleton-block.w40 { width: 40%; height: 18px; }
+    .skeleton-block.w60 { width: 60%; }
+    .skeleton-block.w80 { width: 80%; }
+    .skeleton-block.w100 { width: 100%; }
+    .skeleton-avatar {
+      width: 40px; height: 40px; border-radius: 50%; background: var(--skeleton); margin-right: 12px;
+      position: relative; overflow: hidden;
+    }
+    .shimmer::after, .skeleton-avatar::after {
+      content: "";
+      position: absolute;
+      top: 0; left: -150px;
+      height: 100%; width: 150px;
+      background: linear-gradient(90deg, transparent, var(--skeleton-shimmer), transparent);
+      animation: shimmer 1.4s infinite;
+      opacity: 0.4;
+    }
+    @keyframes shimmer {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(300%); }
+    }
   </style>
 </head>
 <body>
@@ -196,7 +238,7 @@
     };
 
     /* =========================
-       UTIL: e-post → förnamn + validering
+       UTIL
        ========================= */
     const isKarlskogaEmail = (email) => {
       if (!email) return false;
@@ -211,15 +253,71 @@
     };
 
     /* =========================
+       FUN LOADER & SKELETONS
+       ========================= */
+    function FunLoader({ textList, interval = 1400, small = false }) {
+      const fallback = [
+        'Tänder idélampan…',
+        'Flyttar post-it-lappar…',
+        'Skissar på prototyp…',
+        'Brygger innovationskaffe ☕…',
+        'Kalibrerar whiteboarden…',
+        'Bokar workshoprummet…',
+        'Samlar in kloka synpunkter…',
+        'AI:ar lite på upplägget…',
+        'Finslipar pitchen (60 sek)…',
+        'Rullar ut en mini-MVP…',
+        'Tightar budgeten varsamt…',
+        'GDPR-kollar listan…',
+        'Startar testballong…',
+        'Lyfter blicken mot helheten…',
+        'Sätter idé i rörelse…'
+      ];
+      const texts = (textList && textList.length ? textList : fallback);
+      const [i, setI] = useState(0);
+      useEffect(() => {
+        const t = setInterval(() => setI((prev) => (prev + 1) % texts.length), interval);
+        return () => clearInterval(t);
+      }, [texts.length, interval]);
+      return (
+        <div className="loader" style={small ? {padding: '16px'} : {}}>
+          <div className="spinner"></div>
+          <div className="loader-text">{texts[i]}</div>
+        </div>
+      );
+    }
+
+    function PostSkeleton() {
+      return (
+        <div className="skeleton-card">
+          <div style={{display:'flex', alignItems:'center', gap:12}}>
+            <div className="skeleton-avatar"></div>
+            <div style={{flex:1}}>
+              <div className="skeleton-block w40 shimmer"></div>
+              <div className="skeleton-block w60 shimmer"></div>
+            </div>
+          </div>
+          <div className="skeleton-block w100 shimmer" style={{marginTop:14}}></div>
+          <div className="skeleton-block w80 shimmer"></div>
+          <div className="skeleton-block w60 shimmer"></div>
+        </div>
+      );
+    }
+
+    function SkeletonList({ count = 3 }) {
+      return (
+        <div style={{display:'grid', gap:24}}>
+          {Array.from({length: count}).map((_, idx) => <PostSkeleton key={idx} />)}
+        </div>
+      );
+    }
+
+    /* =========================
        UI: Komponenter
        ========================= */
     function Loader({ text = "Laddar..." }) {
-      return (
-        <div className="loader">
-          <div className="spinner"></div>
-          <div className="loader-text">{text}</div>
-        </div>
-      );
+      // behåller API men visar vår FunLoader
+      return <FunLoader />;
     }
 
     function Modal({ isOpen, onClose, title, children }) {
@@ -440,7 +538,6 @@
 
       const loadCategories = async () => {
         try {
-          // ✅ Skicka med session!
           const res = await api.get('categories', { session: session.sessionToken });
           if (res.success) setCategories(res.categories || []);
         } catch (err) {
@@ -522,7 +619,7 @@
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 className="form-input"
-                style={{ minHeight: 120 }}  /* ✅ FIX: style som objekt */
+                style={{ minHeight: 120 }}
                 placeholder="Beskriv vad som händer..."
                 required
               />
@@ -605,7 +702,7 @@
       return (
         <div className="comments-section">
           {loading ? (
-            <div className="loader-text">Laddar kommentarer...</div>
+            <div className="loader-text">Hämtar kommentarer…</div>
           ) : items.length === 0 ? (
             <div className="loader-text">Inga kommentarer ännu.</div>
           ) : (
@@ -682,7 +779,10 @@
         <Modal isOpen={isOpen} onClose={onClose} title="Papperskorg">
           {error && <div className="error-message">{error}</div>}
           {loading ? (
-            <Loader text="Hämtar papperskorg..." />
+            <>
+              <FunLoader small />
+              <SkeletonList count={2} />
+            </>
           ) : items.length === 0 ? (
             <div className="loader-text">Papperskorgen är tom.</div>
           ) : (
@@ -746,7 +846,6 @@
 
       const loadCategories = async () => {
         try {
-          // ✅ Skicka med session!
           const res = await api.get('categories', { session: session.sessionToken });
           if (res.success) setCategories(res.categories || []);
         } catch (err) {
@@ -827,7 +926,10 @@
             )}
 
             {loading ? (
-              <Loader text="Laddar inlägg..." />
+              <>
+                <FunLoader />
+                <SkeletonList count={3} />
+              </>
             ) : posts.length === 0 ? (
               <div className="empty-state">
                 <div className="loader-text">
@@ -949,7 +1051,7 @@
         localStorage.removeItem('karlskoga_session');
       };
 
-      if (loading) return <Loader text="Startar..." />;
+      if (loading) return <FunLoader />;
       if (!session) return <LoginPage onLogin={onLogin} />;
       return <MainPage session={session} onLogout={onLogout} />;
     }
