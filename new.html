@@ -255,37 +255,71 @@
     /* =========================
        FUN LOADER & SKELETONS
        ========================= */
-    function FunLoader({ textList, interval = 1400, small = false }) {
-      const fallback = [
-        'Tänder idélampan…',
-        'Flyttar post-it-lappar…',
-        'Skissar på prototyp…',
-        'Brygger innovationskaffe ☕…',
-        'Kalibrerar whiteboarden…',
-        'Bokar workshoprummet…',
-        'Samlar in kloka synpunkter…',
-        'AI:ar lite på upplägget…',
-        'Finslipar pitchen (60 sek)…',
-        'Rullar ut en mini-MVP…',
-        'Tightar budgeten varsamt…',
-        'GDPR-kollar listan…',
-        'Startar testballong…',
-        'Lyfter blicken mot helheten…',
-        'Sätter idé i rörelse…'
-      ];
-      const texts = (textList && textList.length ? textList : fallback);
-      const [i, setI] = useState(0);
-      useEffect(() => {
-        const t = setInterval(() => setI((prev) => (prev + 1) % texts.length), interval);
-        return () => clearInterval(t);
-      }, [texts.length, interval]);
-      return (
-        <div className="loader" style={small ? {padding: '16px'} : {}}>
-          <div className="spinner"></div>
-          <div className="loader-text">{texts[i]}</div>
-        </div>
-      );
+   function FunLoader({ textList, interval = 1400, small = false }) {
+  const fallback = [
+    'Tänder idélampan…',
+    'Flyttar post-it-lappar…',
+    'Skissar på prototyp…',
+    'Brygger innovationskaffe ☕…',
+    'Kalibrerar whiteboarden…',
+    'Bokar workshoprummet…',
+    'Samlar in kloka synpunkter…',
+    'AI:ar lite på upplägget…',
+    'Finslipar pitchen (60 sek)…',
+    'Rullar ut en mini-MVP…',
+    'Tightar budgeten varsamt…',
+    'GDPR-kollar listan…',
+    'Startar testballong…',
+    'Lyfter blicken mot helheten…',
+    'Sätter idé i rörelse…'
+  ];
+  const texts = (textList && textList.length ? textList : fallback);
+
+  // Fisher–Yates shuffle
+  const shuffle = React.useCallback((arr) => {
+    const a = arr.slice();
+    for (let j = a.length - 1; j > 0; j--) {
+      const k = Math.floor(Math.random() * (j + 1));
+      [a[j], a[k]] = [a[k], a[j]];
     }
+    return a;
+  }, []);
+
+  const [queue, setQueue] = React.useState(() => shuffle(texts));
+  const [current, setCurrent] = React.useState(queue[0]);
+
+  // Om listan (prop) ändras, bygg ny shufflad kö
+  React.useEffect(() => {
+    const q = shuffle(texts);
+    setQueue(q);
+    setCurrent(q[0]);
+  }, [texts, shuffle]);
+
+  React.useEffect(() => {
+    const t = setInterval(() => {
+      setQueue(prev => {
+        const next = prev.slice(1);
+        if (next.length === 0) {
+          const reshuffled = shuffle(texts);
+          setCurrent(reshuffled[0]);
+          return reshuffled;
+        } else {
+          setCurrent(next[0]);
+          return next;
+        }
+      });
+    }, interval);
+    return () => clearInterval(t);
+  }, [texts, interval, shuffle]);
+
+  return (
+    <div className="loader" style={small ? {padding: '16px'} : {}}>
+      <div className="spinner"></div>
+      <div className="loader-text">{current}</div>
+    </div>
+  );
+}
+
 
     function PostSkeleton() {
       return (
