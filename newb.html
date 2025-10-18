@@ -439,4 +439,308 @@
             </div>
 
             <div className="form-group" style={{marginTop:16}}>
-              <label className="form-label">Samman
+              <label className="form-label">Sammanfattning (max 140 tecken)</label>
+              <input type="text" className="form-input" value={summary} onChange={(e)=>setSummary(clamp(e.target.value, 140))} placeholder="Kort teaser till startsidan…" required />
+              <div className="charline"><span>Förhandsvisas på startsidan</span><span>{left} tecken kvar</span></div>
+            </div>
+
+            <div className="form-group" style={{marginTop:16}}>
+              <label className="form-label">Huvudtext</label>
+              <textarea className="form-input" value={text} onChange={(e)=>setText(e.target.value)} placeholder="Beskriv idén eller lösningen…" required />
+            </div>
+
+            <div className="form-group" style={{marginTop:16}}>
+              <label className="form-label">Bilder (valfritt)</label>
+              <input type="file" accept="image/*" multiple onChange={(e)=>setFiles(Array.from(e.target.files||[]))} className="file-input"/>
+              {files.length>0 && <div className="small-muted">{files.length} fil(er) valda</div>}
+            </div>
+
+            <div style={{display:'flex',justifyContent:'flex-end',gap:12,marginTop:20}}>
+              <button type="button" onClick={onClose} className="ghost-btn">Avbryt</button>
+              <button type="submit" disabled={loading} className="primary-btn">{loading?'Publicerar…':'Publicera'}</button>
+            </div>
+          </form>
+        </Modal>
+      );
+    }
+
+    /* ===== REAKTIONER ===== */
+    function ReactionBar({ post, session, onUpdate }) {
+      const [count,setCount] = useState(0);
+      const [hasLiked,setHasLiked] = useState(false);
+      const [busy,setBusy] = useState(false);
+
+      const load = useCallback(async ()=>{
+        const res = await api.get('post/reactions',{ postId: post.post_id, session: session.sessionToken });
+        if (res.success) {
+          setCount((res.counts && res.counts.like) || 0);
+          setHasLiked((res.reactions||[]).some(r => r.userEmail===session.email && r.type==='like'));
+        }
+      },[post.post_id,session.email,session.sessionToken]);
+
+      useEffect(()=>{ load(); },[load]);
+
+      const toggle = async ()=>{
+        setBusy(true);
+        try{
+          if(hasLiked) await api.post('post/reaction/remove',{ session: session.sessionToken, postId: post.post_id });
+          else await api.post('post/reaction/add',{ session: session.sessionToken, postId: post.post_id, type:'like' });
+          await load(); onUpdate && onUpdate();
+        } finally { setBusy(false); }
+      };
+
+      return (
+        <button onClick={toggle} disabled={busy} className={`action-btn ${hasLiked?'liked':''}`}>
+          {hasLiked?'❤️':'♡'} {count}
+        </button>
+      );
+    }
+
+    /* ===== PAPPERSKORG ===== */
+    function TrashModal({ isOpen, onClose, session, onChanged }) {
+      const [loading,setLoading] = useState(true);
+      const [items,setItems] = useState([]);
+      const [error,setError] = useState('');
+      
+      const loadTrash = async ()=>{
+        setLoading(true); setError('');
+        try{
+          const res = await api.get('posts/trash', { session: session.sessionToken });
+          if(!res.success) throw new Error(res.error||'Kunde inte hämta papperskorg');
+          setItems(res.posts||[]);
+        }catch(err){ setError(err.message); } finally { setLoading(false); }
+      };
+      
+      useEffect(()=>{ if(isOpen) loadTrash(); },[isOpen]);
+
+      const restore = async (postId)=>{
+        try{ 
+          const res = await api.post('post/restore',{ session: session.sessionToken, postId });
+          if(!res.success) throw new Error(res.error||'Kunde inte återställa');
+          await loadTrash(); onChanged && onChanged();
+        }catch(err){ alert(err.message); }
+      };
+      
+      const purge = async (postId)=>{
+        if(!confirm('Radera permanent? Detta går inte att ångra.')) return;
+        try{ 
+          const res = await api.post('post/purge',{ session: session.sessionToken, postId });
+          if(!res.success) throw new Error(res.error||'Kunde inte radera permanent');
+          await loadTrash(); onChanged && onChanged();
+        }catch(err){ alert(err.message); }
+      };
+
+      return (
+        <Modal isOpen={isOpen} onClose={onClose} title="Papperskorg">
+          {error && <div className="error-message">{error}</div>}
+          {loading ? <Loader text="Hämtar papperskorg…"/> :
+           items.length===0 ? <div className="loader-text">Papperskorgen är tom.</div> :
+           <div className="trash-list">
+            {items.map(p=>(
+              <div key={p.post_id} className="trash-item">
+                <div>
+                  <div><strong>{p.title || '(utan rubrik)'}</strong></div>
+                  <div className="small-muted">Av {firstNameFromEmail(p.author_email)} • {new Date(p.deleted_at||p.created_at).toLocaleString('sv-SE')}</div>
+                </div>
+                <button className="pill-btn" onClick={()=>restore(p.post_id)}>Återställ</button>
+                <button className="pill-btn delete-btn" onClick={()=>purge(p.post_id)}>Radera permanent</button>
+              </div>
+            ))}
+           </div>}
+        </Modal>
+      );
+    }
+
+    /* ===== HUVUDVY ===== */
+    function MainPage({ session, onLogout }) {
+      const [posts,setPosts] = useState([]);
+      const [categories,setCategories] = useState([]);
+      const [loading,setLoading] = useState(true);
+
+      const [showCreatePost,setShowCreatePost] = useState(false);
+      const [showTrash,setShowTrash] = useState(false);
+      const [confirmOpen,setConfirmOpen] = useState(false);
+      const [postToDelete,setPostToDelete] = useState(null);
+
+      const [searchQuery,setSearchQuery] = useState('');
+      const [categoryFilter,setCategoryFilter] = useState('all');
+      const [authorFilter,setAuthorFilter] = useState('');
+      const [resultCount,setResultCount] = useState(0);
+
+      const loadPosts = async ()=>{
+        setLoading(true);
+        try {
+          const res = await api.get('posts/search',{
+            session: session.sessionToken,
+            search: searchQuery,
+            category: categoryFilter==='all' ? '' : categoryFilter,
+            author: authorFilter
+          });
+          if (res.success) {
+            setPosts(res.posts||[]);
+            setResultCount(res.posts ? res.posts.length : 0);
+          }
+        } finally { setLoading(false); }
+      };
+      
+      const loadCategories = async ()=>{
+        const res = await api.get('categories', { session: session.sessionToken });
+        if (res.success) setCategories(res.categories||[]);
+      };
+
+      useEffect(()=>{ loadCategories(); },[]);
+      useEffect(()=>{
+        const t = setTimeout(()=>{ loadPosts(); }, 250);
+        return ()=>clearTimeout(t);
+      },[searchQuery,categoryFilter,authorFilter]);
+
+      const clearFilters = ()=>{ setSearchQuery(''); setCategoryFilter('all'); setAuthorFilter(''); };
+      const hasActiveFilters = searchQuery || categoryFilter!=='all' || authorFilter;
+
+      const requestDelete = (post)=>{ setPostToDelete(post); setConfirmOpen(true); };
+      const doDelete = async ()=>{
+        if(!postToDelete) return; 
+        setConfirmOpen(false);
+        const res = await api.post('post/delete', { session: session.sessionToken, postId: postToDelete.post_id });
+        if(!res.success) alert(res.error||'Kunde inte radera');
+        await loadPosts(); 
+        setPostToDelete(null);
+      };
+
+      const summaryOf = (p)=>{
+        const s = (p.summary && String(p.summary).trim()) || '';
+        if (s) return clamp(s, 140);
+        return clamp(String(p.text||''), 140);
+      };
+
+      const handleLogout = async ()=>{
+        try { await api.post('auth/logout',{ session: session.sessionToken }); } catch {}
+        onLogout();
+      };
+
+      return (
+        <>
+          <header className="glass-header">
+            <a className="logo-area" href="#">
+              <img src="./hander_och_sker.png" alt="Karlskoga Portal" className="logo-img"/>
+              <span className="tagline">kommunikationsplatsen</span>
+            </a>
+            <div className="user-info">
+              <button className="pill-btn" onClick={()=>setShowTrash(true)} title="Visa papperskorg">🗑️ Papperskorg</button>
+              <span className="user-name" title={session.email}>{session.displayName || firstNameFromEmail(session.email)}</span>
+              <button onClick={handleLogout} className="pill-btn logout-btn">Logga ut</button>
+            </div>
+          </header>
+
+          <main className="main-container">
+            <SearchFilters
+              searchQuery={searchQuery} setSearchQuery={setSearchQuery}
+              categoryFilter={categoryFilter} setCategoryFilter={setCategoryFilter}
+              authorFilter={authorFilter} setAuthorFilter={setAuthorFilter}
+              categories={categories} onClear={clearFilters}
+            />
+
+            {hasActiveFilters && (
+              <div className="results-count">{loading ? 'Söker…' : `${resultCount} inlägg funna`}</div>
+            )}
+
+            {!hasActiveFilters && (
+              <div className="create-post-card" onClick={()=>setShowCreatePost(true)}>
+                <div className="create-post-prompt">💡 Klicka för att skapa ett inlägg – vad har du på gång {session.displayName || firstNameFromEmail(session.email)}?</div>
+              </div>
+            )}
+
+            {loading ? (
+              <FunLoader/>
+            ) : posts.length===0 ? (
+              <div className="loader-text">{hasActiveFilters ? 'Inga inlägg matchar dina sökkriterier.' : 'Inga inlägg ännu. Var först ut!'}</div>
+            ) : (
+              <div className="posts-grid">
+                {posts.map(post=>{
+                  const isAuthor = String(post.author_email||'').toLowerCase() === String(session.email||'').toLowerCase();
+                  return (
+                    <article key={post.post_id} className="post-card">
+                      <div className="post-header">
+                        <div className="post-avatar">{(post.author_email||'?')[0].toUpperCase()}</div>
+                        <div className="post-meta">
+                          <h2 className="post-title">{post.title || '(utan rubrik)'}</h2>
+                          <div className="post-author-info">
+                            <div title={post.author_email}>{firstNameFromEmail(post.author_email)}</div>
+                            <div>{new Date(post.created_at).toLocaleString('sv-SE')}</div>
+                            {post.category && (
+                              <div className="category-badge" style={{ backgroundColor: post.category.color || '#6B7280' }}>
+                                {post.category.name}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        {isAuthor && (
+                          <button className="pill-btn delete-btn" title="Flytta till papperskorg" onClick={()=>requestDelete(post)}>×</button>
+                        )}
+                      </div>
+
+                      <div className="post-summary">{summaryOf(post)}</div>
+
+                      <div className="post-actions">
+                        <ReactionBar post={post} session={session}/>
+                        <span className="comment-count">💬 {post.comments_count||0}</span>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            )}
+          </main>
+
+          <CreatePostModal isOpen={showCreatePost} onClose={()=>setShowCreatePost(false)} session={session} onSuccess={()=>loadPosts()}/>
+          <TrashModal isOpen={showTrash} onClose={()=>setShowTrash(false)} session={session} onChanged={()=>loadPosts()}/>
+          <ConfirmModal
+            isOpen={confirmOpen}
+            title="Radera inlägg?"
+            message="Vill du verkligen radera inlägget? Det flyttas till papperskorgen och kan återställas."
+            confirmText="Ja, radera"
+            cancelText="Avbryt"
+            onConfirm={doDelete}
+            onCancel={()=>{ setConfirmOpen(false); setPostToDelete(null); }}
+          />
+        </>
+      );
+    }
+
+    /* ===== APP ===== */
+    function App(){
+      const [session,setSession] = useState(null);
+      const [booting,setBooting] = useState(true);
+      
+      useEffect(()=>{
+        const saved = localStorage.getItem('karlskoga_session');
+        if (saved) { 
+          try { 
+            setSession(JSON.parse(saved)); 
+          } catch { 
+            localStorage.removeItem('karlskoga_session'); 
+          } 
+        }
+        setBooting(false);
+      },[]);
+      
+      const onLogin = (sess)=>{ 
+        setSession(sess); 
+        localStorage.setItem('karlskoga_session', JSON.stringify(sess)); 
+      };
+      
+      const onLogout = ()=>{ 
+        setSession(null); 
+        localStorage.removeItem('karlskoga_session'); 
+      };
+      
+      if (booting) return <Loader text="Startar…"/>;
+      if (!session) return <LoginPage onLogin={onLogin}/>;
+      return <MainPage session={session} onLogout={onLogout}/>;
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App/>);
+  </script>
+</body>
+</html>
