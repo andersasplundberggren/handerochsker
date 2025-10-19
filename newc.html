@@ -689,11 +689,12 @@
           <header className="glass-header">
             <a className="logo-area" href="#">
               <img src="./hander_och_sker.png" alt="Karlskoga Portal" className="logo-img"/>
-              <span className="tagline">kommunikationsplatsen</span>
+              <span className="tagline">Platsen där vi visar vad som händer & sker</span>
             </a>
             <div className="user-info">
               <button className="pill-btn" onClick={()=>setShowTrash(true)} title="Visa papperskorg">🗑️ Papperskorg</button>
-              <span className="Inloggad som user-name" title={session.email}>{session.displayName || firstNameFromEmail(session.email)}</span>
+              <span className="login-note" title={session?.email}>Du är inloggad som <strong>{session?.displayName || firstNameFromEmail(session?.email)}</strong></span>
+
               <button onClick={handleLogout} className="pill-btn logout-btn">Logga ut</button>
             </div>
           </header>
