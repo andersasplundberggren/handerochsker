@@ -693,7 +693,7 @@
             </a>
             <div className="user-info">
               <button className="pill-btn" onClick={()=>setShowTrash(true)} title="Visa papperskorg">🗑️ Papperskorg</button>
-              <span className="user-name" title={session.email}>{session.displayName || firstNameFromEmail(session.email)}</span>
+              <span className="Inloggad som user-name" title={session.email}>{session.displayName || firstNameFromEmail(session.email)}</span>
               <button onClick={handleLogout} className="pill-btn logout-btn">Logga ut</button>
             </div>
           </header>
