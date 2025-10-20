@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Karlskoga Portal</title>
+  <title>Händer & sker en plats för initiativ</title>
   <meta name="theme-color" content="#F5F7FA"/>
 
   <!-- React + Babel UMD -->
@@ -219,11 +219,46 @@
     /* ===== FUN LOADER ===== */
     function FunLoader({ interval=1400 }) {
       const lines = [
-        'Brygger idékaffe…','Slipar på lösningen…','Vässar post-it-pennorna…','Kalibrerar innovationskompassen…',
-        'Trycker på stora gröna knappen…','Sätter på kreativitetshjälmen…','Plockar fram aha-upplevelser…',
-        'Sparkar igång prototypmaskinen…','Mäter två gånger, lanserar en…','Limmar fast nyttoeffekt…',
-        'Skruvar i förbättringsskruven…','Drar idékablar i kanaler…','Sätter fogkryss mellan förslag…',
-        'Tömmer feedback-lådan…','Sätter på skyddsglasögon för wow…'
+        'Brygger en prototyp på låg värme…',
+    'Itererar i 120 BPM…',
+    'Skruvar upp modet att testa…',
+    'Dammar av en vild idé…',
+    'Skarvar ihop små vinster till stor nytta…',
+    'Trycker “publish” på en beta…',
+    'Samlar in lärdomar i realtid…',
+    'Delar framgång OCH missar—transparens på!…',
+    'Sätter på innovationsglasögonen…',
+    'Knådar feedback till förbättring…',
+    'Gör det enkelt först, smart sen…',
+    'Mäter, lär, gör om…',
+    'Bjuder in fler hjärnor till bordet…',
+    'Sänker trösklar, höjer tempot…',
+    'Tjuvstartar en micro-pilot…',
+    'Vässar hypoteserna…',
+    'Trycker på “ship it” (med fallskärm)…',
+    'Skriver ner det vi just lärde oss…',
+    'Testar i liten skala—drömmer i stor…',
+    'Byter magkänsla mot mätning (och tillbaka)…',
+    'Sätter ljus på det som funkar…',
+    'Bollar idéer över disciplin-gränser…',
+    'Firar små steg framåt 🎉…',
+    'Komposterar gamla arbetssätt till ny jord…',
+    'Plockar bort onödigt krångel…',
+    'Tar bort prestige, lägger till nyfikenhet…',
+    'Sätter upp A/B/C—för säkerhets skull…',
+    'Gör en snabb skiss, vågar visa…',
+    'Öppnar upp koden—hej delningsglädje!…',
+    'Bygger tillsammans, lär tillsammans…',
+    'Städar undan “så har vi alltid gjort”…',
+    'Packar idé i MVP-format…',
+    'Värmer upp kreativiteten med en demo…',
+    'Sätter “feedback-first” i status…',
+    'Trollar fram en aha-upplevelse…',
+    'Synkar kompass: nytta, nyfikenhet, nöje…',
+    'Sänker risk, höjer lärande…',
+    'Rullar ut en trygg testmiljö…',
+    'Ger oss själva tillåtelse att prova…',
+    'Lånar bra från andra, ger tillbaka…',
       ];
       const [i,setI] = useState(() => Math.floor(Math.random()*lines.length));
       useEffect(() => { const id = setInterval(()=>setI(x => (x+1)%lines.length), interval); return ()=>clearInterval(id); }, [interval]);
@@ -275,10 +310,10 @@
     /* ===== INFO MODAL ===== */
     function InfoModal({ isOpen, onClose, showEmailInfo = false }) {
       return (
-        <Modal isOpen={isOpen} onClose={onClose} title="ℹ️ Om Karlskoga Portal">
+        <Modal isOpen={isOpen} onClose={onClose} title="ℹ️ Om den här sidan">
           <div className="info-modal-content">
             <p>
-              <strong>Detta är ett proof of concept</strong> – en testversion av en intern kommunikationsplattform för Karlskoga kommun.
+              <strong>Detta är ett proof of concept</strong> – en testversion av en plattform för att dela initiativ inom Karlskoga kommun.
             </p>
             
             <div className="info-highlight">
@@ -301,7 +336,7 @@
             )}
 
             <p style={{marginTop: 16, fontSize: 14, color: '#6B7280'}}>
-              Plattformen är utvecklad som en demonstration av hur moderna interna kommunikationsverktyg kan fungera inom kommunal verksamhet.
+              Plattformen är utvecklad som en demonstration av hur en intern plattform för att dela initiativ kan se ut och fungera inom kommunal verksamhet.
             </p>
           </div>
         </Modal>
@@ -347,7 +382,7 @@
         <div className="login-container">
           <div className="login-card">
             <img src="./hander_och_sker.png" alt="Karlskoga Portal" className="login-logo"/>
-            <h1 className="login-title">Karlskoga Portal</h1>
+            <h1 className="login-title">platsen där initiativ synliggörs</h1>
             <p className="login-subtitle">Logga in med din @karlskoga.se-adress</p>
 
             {/* INFO BANNER */}
@@ -938,7 +973,7 @@
           <header className="glass-header">
             <a className="logo-area" href="#">
               <img src="./hander_och_sker.png" alt="Karlskoga Portal" className="logo-img"/>
-              <span className="tagline">kommunikationsplatsen</span>
+              <span className="tagline">Plattformen för initiativ</span>
             </a>
             <div className="user-info">
               <button 
