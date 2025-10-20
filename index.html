@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Karlskoga Portal</title>
+  <title>Händer & sker en plats för initiativ</title>
   <meta name="theme-color" content="#F5F7FA"/>
 
   <!-- React + Babel UMD -->
@@ -139,6 +139,17 @@
     .post-detail-images{display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:12px;margin:16px 0}
     .post-detail-image{width:100%;border-radius:8px;cursor:pointer;transition:.2s}
     .post-detail-image:hover{transform:scale(1.02);box-shadow:var(--shadow-md)}
+
+    .info-banner{background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:2px solid #F59E0B;border-radius:16px;padding:20px;margin-bottom:24px;box-shadow:0 4px 12px rgba(245,158,11,0.2)}
+    .info-banner-title{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:700;color:#92400E;margin-bottom:12px}
+    .info-banner-text{font-size:14px;line-height:1.6;color:#78350F;margin-bottom:8px}
+    .info-banner-text strong{font-weight:700;color:#92400E}
+    .info-btn{position:relative;background:rgba(255,255,255,0.3);border:1px solid rgba(0,0,0,0.1);width:32px;height:32px;border-radius:50%;display:grid;place-items:center;cursor:pointer;transition:0.2s;font-size:16px;font-weight:700;color:var(--accent-blue)}
+    .info-btn:hover{background:rgba(255,255,255,0.6);transform:scale(1.1)}
+    .info-modal-content{line-height:1.7;color:#374151}
+    .info-modal-content p{margin-bottom:12px}
+    .info-modal-content strong{color:#1F2937;font-weight:600}
+    .info-highlight{background:#FEF3C7;padding:12px 16px;border-radius:8px;border-left:3px solid #F59E0B;margin:12px 0;font-size:14px}
   </style>
 </head>
 <body>
@@ -148,7 +159,7 @@
     const { useState, useEffect, useCallback } = React;
 
     /* ===== KONFIG - UPPDATERA MED DIN URL ===== */
-    const API_URL = 'https://script.google.com/macros/s/AKfycbwDDHVyzIe-NYk8hbf2KrjiR68UJmjT8gAcO-_eosGoJqIuuOsvDojqabWyGGX3ba8/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxZMANc9aOcTvhXBNToTL55C-rTQjIZfwdk_JHmD0LeefEGwZqRMhnfklwJ5I__YX8/exec';
 
     /* ===== API ===== */
     const api = {
@@ -208,11 +219,46 @@
     /* ===== FUN LOADER ===== */
     function FunLoader({ interval=1400 }) {
       const lines = [
-        'Brygger idékaffe…','Slipar på lösningen…','Vässar post-it-pennorna…','Kalibrerar innovationskompassen…',
-        'Trycker på stora gröna knappen…','Sätter på kreativitetshjälmen…','Plockar fram aha-upplevelser…',
-        'Sparkar igång prototypmaskinen…','Mäter två gånger, lanserar en…','Limmar fast nyttoeffekt…',
-        'Skruvar i förbättringsskruven…','Drar idékablar i kanaler…','Sätter fogkryss mellan förslag…',
-        'Tömmer feedback-lådan…','Sätter på skyddsglasögon för wow…'
+        'Brygger en prototyp på låg värme…',
+    'Itererar i 120 BPM…',
+    'Skruvar upp modet att testa…',
+    'Dammar av en vild idé…',
+    'Skarvar ihop små vinster till stor nytta…',
+    'Trycker “publish” på en beta…',
+    'Samlar in lärdomar i realtid…',
+    'Delar framgång OCH missar—transparens på!…',
+    'Sätter på innovationsglasögonen…',
+    'Knådar feedback till förbättring…',
+    'Gör det enkelt först, smart sen…',
+    'Mäter, lär, gör om…',
+    'Bjuder in fler hjärnor till bordet…',
+    'Sänker trösklar, höjer tempot…',
+    'Tjuvstartar en micro-pilot…',
+    'Vässar hypoteserna…',
+    'Trycker på “ship it” (med fallskärm)…',
+    'Skriver ner det vi just lärde oss…',
+    'Testar i liten skala—drömmer i stor…',
+    'Byter magkänsla mot mätning (och tillbaka)…',
+    'Sätter ljus på det som funkar…',
+    'Bollar idéer över disciplin-gränser…',
+    'Firar små steg framåt 🎉…',
+    'Komposterar gamla arbetssätt till ny jord…',
+    'Plockar bort onödigt krångel…',
+    'Tar bort prestige, lägger till nyfikenhet…',
+    'Sätter upp A/B/C—för säkerhets skull…',
+    'Gör en snabb skiss, vågar visa…',
+    'Öppnar upp koden—hej delningsglädje!…',
+    'Bygger tillsammans, lär tillsammans…',
+    'Städar undan “så har vi alltid gjort”…',
+    'Packar idé i MVP-format…',
+    'Värmer upp kreativiteten med en demo…',
+    'Sätter “feedback-first” i status…',
+    'Trollar fram en aha-upplevelse…',
+    'Synkar kompass: nytta, nyfikenhet, nöje…',
+    'Sänker risk, höjer lärande…',
+    'Rullar ut en trygg testmiljö…',
+    'Ger oss själva tillåtelse att prova…',
+    'Lånar bra från andra, ger tillbaka…',
       ];
       const [i,setI] = useState(() => Math.floor(Math.random()*lines.length));
       useEffect(() => { const id = setInterval(()=>setI(x => (x+1)%lines.length), interval); return ()=>clearInterval(id); }, [interval]);
@@ -261,13 +307,50 @@
       );
     }
 
-    /* ===== LOGIN ===== */
+    /* ===== INFO MODAL ===== */
+    function InfoModal({ isOpen, onClose, showEmailInfo = false }) {
+      return (
+        <Modal isOpen={isOpen} onClose={onClose} title="ℹ️ Om den här sidan">
+          <div className="info-modal-content">
+            <p>
+              <strong>Detta är ett proof of concept</strong> – en testversion av en plattform för att dela initiativ inom Karlskoga kommun.
+            </p>
+            
+            <div className="info-highlight">
+              <strong>⚠️ Viktig information om data:</strong>
+              <br />
+              All information som skrivs här (inlägg, kommentarer, reaktioner) samt uppgifter om vem som skriver lagras på ett privat Google-konto. 
+              Denna data används enbart för test- och demonstrationssyfte.
+            </div>
+
+            {showEmailInfo && (
+              <div className="info-highlight" style={{background: '#E0E7FF', borderLeftColor: '#5863C7'}}>
+                <strong>📧 Om inloggningskoden:</strong>
+                <br />
+                Koden skickas från e-postadressen <strong>anders.asplundberggren@gmail.com</strong>
+                <br />
+                Mailet innehåller <strong>endast en 6-siffrig kod</strong> – inga länkar eller bilagor.
+                <br />
+                Skriv in koden på inloggningssidan för att komma in.
+              </div>
+            )}
+
+            <p style={{marginTop: 16, fontSize: 14, color: '#6B7280'}}>
+              Plattformen är utvecklad som en demonstration av hur en intern plattform för att dela initiativ kan se ut och fungera inom kommunal verksamhet.
+            </p>
+          </div>
+        </Modal>
+      );
+    }
+
+    /* ===== LOGIN MED INFO-BANNER ===== */
     function LoginPage({ onLogin }) {
       const [email,setEmail] = useState('');
       const [otpSent,setOtpSent] = useState(false);
       const [otp,setOtp] = useState('');
       const [loading,setLoading] = useState(false);
       const [error,setError] = useState('');
+      const [showInfo, setShowInfo] = useState(false);
 
       const requestOTP = async (e) => {
         e.preventDefault();
@@ -299,8 +382,39 @@
         <div className="login-container">
           <div className="login-card">
             <img src="./hander_och_sker.png" alt="Karlskoga Portal" className="login-logo"/>
-            <h1 className="login-title">Karlskoga Portal</h1>
+            <h1 className="login-title">platsen där initiativ synliggörs</h1>
             <p className="login-subtitle">Logga in med din @karlskoga.se-adress</p>
+
+            {/* INFO BANNER */}
+            <div className="info-banner">
+              <div className="info-banner-title">
+                ℹ️ Proof of Concept
+              </div>
+              <div className="info-banner-text">
+                Detta är en testversion. All data lagras på ett privat Google-konto för demonstrationssyfte.
+              </div>
+              <div className="info-banner-text">
+                <strong>Inloggningskod skickas från:</strong> anders.asplundberggren@gmail.com
+                <br />
+                <small>(Mailet innehåller endast en 6-siffrig kod – inga länkar)</small>
+              </div>
+              <button 
+                onClick={() => setShowInfo(true)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#92400E',
+                  textDecoration: 'underline',
+                  cursor: 'pointer',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  padding: 0,
+                  marginTop: 4
+                }}
+              >
+                Läs mer →
+              </button>
+            </div>
 
             {!otpSent ? (
               <form onSubmit={requestOTP} className="login-form">
@@ -325,6 +439,8 @@
               </form>
             )}
           </div>
+
+          <InfoModal isOpen={showInfo} onClose={() => setShowInfo(false)} showEmailInfo={true} />
         </div>
       );
     }
@@ -489,237 +605,236 @@
       );
     }
 
-    /* ===== POST DETAIL MODAL ===== */
     /* ===== POST DETAIL MODAL MED KOMMENTARER ===== */
-function PostDetailModal({ isOpen, onClose, post, session }) {
-  const [comments, setComments] = useState([]);
-  const [commentText, setCommentText] = useState('');
-  const [loadingComments, setLoadingComments] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+    function PostDetailModal({ isOpen, onClose, post, session }) {
+      const [comments, setComments] = useState([]);
+      const [commentText, setCommentText] = useState('');
+      const [loadingComments, setLoadingComments] = useState(false);
+      const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    if (isOpen && post) {
-      loadComments();
-    }
-  }, [isOpen, post]);
+      useEffect(() => {
+        if (isOpen && post) {
+          loadComments();
+        }
+      }, [isOpen, post]);
 
-  const loadComments = async () => {
-    if (!post) return;
-    setLoadingComments(true);
-    try {
-      const res = await api.get('post/comments', { 
-        postId: post.post_id, 
-        session: session.sessionToken 
-      });
-      if (res.success) {
-        setComments(res.comments || []);
-      }
-    } catch (err) {
-      console.error('Kunde inte ladda kommentarer:', err);
-    } finally {
-      setLoadingComments(false);
-    }
-  };
+      const loadComments = async () => {
+        if (!post) return;
+        setLoadingComments(true);
+        try {
+          const res = await api.get('post/comments', { 
+            postId: post.post_id, 
+            session: session.sessionToken 
+          });
+          if (res.success) {
+            setComments(res.comments || []);
+          }
+        } catch (err) {
+          console.error('Kunde inte ladda kommentarer:', err);
+        } finally {
+          setLoadingComments(false);
+        }
+      };
 
-  const submitComment = async (e) => {
-    e.preventDefault();
-    if (!commentText.trim()) return;
-    
-    setSubmitting(true);
-    try {
-      const res = await api.post('post/comment/add', {
-        session: session.sessionToken,
-        postId: post.post_id,
-        text: commentText
-      });
-      
-      if (res.success) {
-        setCommentText('');
-        await loadComments();
-      } else {
-        alert('Kunde inte skicka kommentar: ' + (res.error || 'Okänt fel'));
-      }
-    } catch (err) {
-      alert('Fel vid kommentering: ' + err.message);
-    } finally {
-      setSubmitting(false);
-    }
-  };
+      const submitComment = async (e) => {
+        e.preventDefault();
+        if (!commentText.trim()) return;
+        
+        setSubmitting(true);
+        try {
+          const res = await api.post('post/comment/add', {
+            session: session.sessionToken,
+            postId: post.post_id,
+            text: commentText
+          });
+          
+          if (res.success) {
+            setCommentText('');
+            await loadComments();
+          } else {
+            alert('Kunde inte skicka kommentar: ' + (res.error || 'Okänt fel'));
+          }
+        } catch (err) {
+          alert('Fel vid kommentering: ' + err.message);
+        } finally {
+          setSubmitting(false);
+        }
+      };
 
-  if (!post) return null;
+      if (!post) return null;
 
-  return (
-    <Modal isOpen={isOpen} onClose={onClose} title={post.title || '(utan rubrik)'}>
-      <div className="post-detail-meta">
-        <div className="post-avatar" style={{width:48,height:48,fontSize:18}}>
-          {(post.author_email||'?')[0].toUpperCase()}
-        </div>
-        <div style={{flex:1}}>
-          <div style={{fontWeight:600,marginBottom:4}}>
-            {firstNameFromEmail(post.author_email)}
-          </div>
-          <div style={{fontSize:13,color:'var(--text-secondary)'}}>
-            {new Date(post.created_at).toLocaleString('sv-SE')}
-          </div>
-        </div>
-        {post.category && (
-          <div className="category-badge" style={{ backgroundColor: post.category.color || '#6B7280' }}>
-            {post.category.name}
-          </div>
-        )}
-      </div>
-
-      {post.summary && (
-        <div style={{
-          background: 'linear-gradient(135deg, #E8ECFF, #F0F4FF)',
-          padding: 16,
-          borderRadius: 12,
-          marginBottom: 16,
-          fontWeight: 500,
-          color: '#374151'
-        }}>
-          {post.summary}
-        </div>
-      )}
-
-      <div className="post-detail-content">
-        {post.text}
-      </div>
-
-      {post.images && post.images.length > 0 && (
-        <div className="post-detail-images">
-          {post.images.map((img, idx) => (
-            <img 
-              key={idx}
-              src={img.thumbnailUrl} 
-              alt={`Bild ${idx+1}`}
-              className="post-detail-image"
-              onClick={() => window.open(img.fullUrl, '_blank')}
-            />
-          ))}
-        </div>
-      )}
-
-      <div style={{marginTop:24,paddingTop:16,borderTop:'1px solid #e5e7eb'}}>
-        <ReactionBar post={post} session={session}/>
-      </div>
-
-      {/* KOMMENTARSSEKTION */}
-      <div style={{marginTop:24,paddingTop:20,borderTop:'1px solid #e5e7eb'}}>
-        <h3 style={{fontSize:16,fontWeight:600,marginBottom:16,display:'flex',alignItems:'center',gap:8}}>
-          💬 Kommentarer
-          <span style={{fontSize:14,fontWeight:400,color:'var(--text-secondary)'}}>
-            ({comments.length})
-          </span>
-        </h3>
-
-        {/* Kommentarslista */}
-        {loadingComments ? (
-          <div style={{textAlign:'center',padding:20,color:'var(--text-secondary)'}}>
-            Laddar kommentarer...
-          </div>
-        ) : comments.length === 0 ? (
-          <div style={{textAlign:'center',padding:20,color:'var(--text-secondary)',fontSize:14}}>
-            Inga kommentarer ännu. Var först att kommentera!
-          </div>
-        ) : (
-          <div style={{marginBottom:16}}>
-            {comments.map(comment => (
-              <div key={comment.comment_id} style={{
-                background: 'rgba(249,250,251,0.8)',
-                border: '1px solid #e5e7eb',
-                borderRadius: 12,
-                padding: 12,
-                marginBottom: 10
-              }}>
-                <div style={{
-                  display:'flex',
-                  gap:8,
-                  alignItems:'center',
-                  marginBottom:6,
-                  fontSize:12,
-                  color:'var(--text-secondary)'
-                }}>
-                  <div style={{
-                    width:24,
-                    height:24,
-                    borderRadius:'50%',
-                    background:'#e5e7eb',
-                    display:'grid',
-                    placeItems:'center',
-                    fontSize:11,
-                    fontWeight:700,
-                    color:'#111827'
-                  }}>
-                    {(comment.user_email||'?')[0].toUpperCase()}
-                  </div>
-                  <span style={{fontWeight:600,color:'#374151'}}>
-                    {firstNameFromEmail(comment.user_email)}
-                  </span>
-                  <span>•</span>
-                  <span>{new Date(comment.created_at).toLocaleString('sv-SE')}</span>
-                </div>
-                <div style={{
-                  paddingLeft:32,
-                  color:'#374151',
-                  lineHeight:1.5,
-                  whiteSpace:'pre-wrap'
-                }}>
-                  {comment.text}
-                </div>
+      return (
+        <Modal isOpen={isOpen} onClose={onClose} title={post.title || '(utan rubrik)'}>
+          <div className="post-detail-meta">
+            <div className="post-avatar" style={{width:48,height:48,fontSize:18}}>
+              {(post.author_email||'?')[0].toUpperCase()}
+            </div>
+            <div style={{flex:1}}>
+              <div style={{fontWeight:600,marginBottom:4}}>
+                {firstNameFromEmail(post.author_email)}
               </div>
-            ))}
+              <div style={{fontSize:13,color:'var(--text-secondary)'}}>
+                {new Date(post.created_at).toLocaleString('sv-SE')}
+              </div>
+            </div>
+            {post.category && (
+              <div className="category-badge" style={{ backgroundColor: post.category.color || '#6B7280' }}>
+                {post.category.name}
+              </div>
+            )}
           </div>
-        )}
 
-        {/* Kommentarsformulär */}
-        <form onSubmit={submitComment} style={{display:'flex',gap:8,marginTop:12}}>
-          <input
-            type="text"
-            value={commentText}
-            onChange={(e) => setCommentText(e.target.value)}
-            placeholder="Skriv en kommentar..."
-            disabled={submitting}
-            style={{
-              flex:1,
-              padding:'10px 14px',
-              border:'1px solid rgba(0,0,0,.1)',
-              borderRadius:10,
-              fontSize:14,
-              background:'rgba(255,255,255,.9)',
-              transition:'.2s'
-            }}
-            onFocus={(e) => {
-              e.target.style.borderColor = 'var(--accent-blue)';
-              e.target.style.boxShadow = '0 0 0 3px rgba(88,99,199,.1)';
-            }}
-            onBlur={(e) => {
-              e.target.style.borderColor = 'rgba(0,0,0,.1)';
-              e.target.style.boxShadow = 'none';
-            }}
-          />
-          <button
-            type="submit"
-            disabled={!commentText.trim() || submitting}
-            style={{
-              border:'none',
-              padding:'10px 16px',
-              borderRadius:10,
-              background: commentText.trim() && !submitting ? 'var(--accent-blue)' : '#d1d5db',
-              color:'#fff',
-              fontWeight:700,
-              cursor: commentText.trim() && !submitting ? 'pointer' : 'not-allowed',
-              fontSize:14,
-              transition:'.2s'
-            }}
-          >
-            {submitting ? 'Skickar...' : 'Skicka'}
-          </button>
-        </form>
-      </div>
-    </Modal>
-  );
-}
+          {post.summary && (
+            <div style={{
+              background: 'linear-gradient(135deg, #E8ECFF, #F0F4FF)',
+              padding: 16,
+              borderRadius: 12,
+              marginBottom: 16,
+              fontWeight: 500,
+              color: '#374151'
+            }}>
+              {post.summary}
+            </div>
+          )}
+
+          <div className="post-detail-content">
+            {post.text}
+          </div>
+
+          {post.images && post.images.length > 0 && (
+            <div className="post-detail-images">
+              {post.images.map((img, idx) => (
+                <img 
+                  key={idx}
+                  src={img.thumbnailUrl} 
+                  alt={`Bild ${idx+1}`}
+                  className="post-detail-image"
+                  onClick={() => window.open(img.fullUrl, '_blank')}
+                />
+              ))}
+            </div>
+          )}
+
+          <div style={{marginTop:24,paddingTop:16,borderTop:'1px solid #e5e7eb'}}>
+            <ReactionBar post={post} session={session}/>
+          </div>
+
+          {/* KOMMENTARSSEKTION */}
+          <div style={{marginTop:24,paddingTop:20,borderTop:'1px solid #e5e7eb'}}>
+            <h3 style={{fontSize:16,fontWeight:600,marginBottom:16,display:'flex',alignItems:'center',gap:8}}>
+              💬 Kommentarer
+              <span style={{fontSize:14,fontWeight:400,color:'var(--text-secondary)'}}>
+                ({comments.length})
+              </span>
+            </h3>
+
+            {/* Kommentarslista */}
+            {loadingComments ? (
+              <div style={{textAlign:'center',padding:20,color:'var(--text-secondary)'}}>
+                Laddar kommentarer...
+              </div>
+            ) : comments.length === 0 ? (
+              <div style={{textAlign:'center',padding:20,color:'var(--text-secondary)',fontSize:14}}>
+                Inga kommentarer ännu. Var först att kommentera!
+              </div>
+            ) : (
+              <div style={{marginBottom:16}}>
+                {comments.map(comment => (
+                  <div key={comment.comment_id} style={{
+                    background: 'rgba(249,250,251,0.8)',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: 12,
+                    padding: 12,
+                    marginBottom: 10
+                  }}>
+                    <div style={{
+                      display:'flex',
+                      gap:8,
+                      alignItems:'center',
+                      marginBottom:6,
+                      fontSize:12,
+                      color:'var(--text-secondary)'
+                    }}>
+                      <div style={{
+                        width:24,
+                        height:24,
+                        borderRadius:'50%',
+                        background:'#e5e7eb',
+                        display:'grid',
+                        placeItems:'center',
+                        fontSize:11,
+                        fontWeight:700,
+                        color:'#111827'
+                      }}>
+                        {(comment.user_email||'?')[0].toUpperCase()}
+                      </div>
+                      <span style={{fontWeight:600,color:'#374151'}}>
+                        {firstNameFromEmail(comment.user_email)}
+                      </span>
+                      <span>•</span>
+                      <span>{new Date(comment.created_at).toLocaleString('sv-SE')}</span>
+                    </div>
+                    <div style={{
+                      paddingLeft:32,
+                      color:'#374151',
+                      lineHeight:1.5,
+                      whiteSpace:'pre-wrap'
+                    }}>
+                      {comment.text}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Kommentarsformulär */}
+            <form onSubmit={submitComment} style={{display:'flex',gap:8,marginTop:12}}>
+              <input
+                type="text"
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                placeholder="Skriv en kommentar..."
+                disabled={submitting}
+                style={{
+                  flex:1,
+                  padding:'10px 14px',
+                  border:'1px solid rgba(0,0,0,.1)',
+                  borderRadius:10,
+                  fontSize:14,
+                  background:'rgba(255,255,255,.9)',
+                  transition:'.2s'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = 'var(--accent-blue)';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(88,99,199,.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = 'rgba(0,0,0,.1)';
+                  e.target.style.boxShadow = 'none';
+                }}
+              />
+              <button
+                type="submit"
+                disabled={!commentText.trim() || submitting}
+                style={{
+                  border:'none',
+                  padding:'10px 16px',
+                  borderRadius:10,
+                  background: commentText.trim() && !submitting ? 'var(--accent-blue)' : '#d1d5db',
+                  color:'#fff',
+                  fontWeight:700,
+                  cursor: commentText.trim() && !submitting ? 'pointer' : 'not-allowed',
+                  fontSize:14,
+                  transition:'.2s'
+                }}
+              >
+                {submitting ? 'Skickar...' : 'Skicka'}
+              </button>
+            </form>
+          </div>
+        </Modal>
+      );
+    }
 
     /* ===== PAPPERSKORG ===== */
     function TrashModal({ isOpen, onClose, session, onChanged }) {
@@ -784,6 +899,7 @@ function PostDetailModal({ isOpen, onClose, post, session }) {
 
       const [showCreatePost,setShowCreatePost] = useState(false);
       const [showTrash,setShowTrash] = useState(false);
+      const [showInfo, setShowInfo] = useState(false);
       const [confirmOpen,setConfirmOpen] = useState(false);
       const [postToDelete,setPostToDelete] = useState(null);
       
@@ -847,7 +963,6 @@ function PostDetailModal({ isOpen, onClose, post, session }) {
       };
 
       const openPost = (post, e) => {
-        // Prevent opening if clicking delete button
         if (e.target.closest('.delete-btn')) return;
         setSelectedPost(post);
         setShowPostDetail(true);
@@ -858,12 +973,18 @@ function PostDetailModal({ isOpen, onClose, post, session }) {
           <header className="glass-header">
             <a className="logo-area" href="#">
               <img src="./hander_och_sker.png" alt="Karlskoga Portal" className="logo-img"/>
-              <span className="tagline">Platsen där vi visar vad som händer & sker</span>
+              <span className="tagline">Plattformen för initiativ</span>
             </a>
             <div className="user-info">
+              <button 
+                className="info-btn" 
+                onClick={()=>setShowInfo(true)} 
+                title="Information om plattformen"
+              >
+                ℹ️
+              </button>
               <button className="pill-btn" onClick={()=>setShowTrash(true)} title="Visa papperskorg">🗑️ Papperskorg</button>
-              <span className="login-note" title={session?.email}>Du är inloggad som <strong>{session?.displayName || firstNameFromEmail(session?.email)}</strong></span>
-
+              <span className="user-name" title={session.email}>{session.displayName || firstNameFromEmail(session.email)}</span>
               <button onClick={handleLogout} className="pill-btn logout-btn">Logga ut</button>
             </div>
           </header>
@@ -945,6 +1066,7 @@ function PostDetailModal({ isOpen, onClose, post, session }) {
             post={selectedPost} 
             session={session}
           />
+          <InfoModal isOpen={showInfo} onClose={() => setShowInfo(false)} showEmailInfo={false} />
           <ConfirmModal
             isOpen={confirmOpen}
             title="Radera inlägg?"
