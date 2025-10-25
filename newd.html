@@ -145,7 +145,15 @@
     @keyframes spin{to{transform:rotate(360deg)}}
     .loader-text{color:#CBD5E1;font-size:15px;text-align:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);padding:8px 12px;border-radius:6px}
 
-    .main-container{max-width:680px;margin:0 auto;padding:16px 16px 80px;position:relative;z-index:1}
+    /* Öka bredd så 3 kort ryms */
+    .main-container{
+      max-width:1200px;
+      margin:0 auto;
+      padding:16px 16px 80px;
+      position:relative;
+      z-index:1;
+    }
+
     .search-filters{
       background:linear-gradient(to bottom, var(--glass-bg), var(--glass-bg)),
                  linear-gradient(135deg, var(--card-accent), transparent);
@@ -161,14 +169,15 @@
     .posts-grid{margin-top:0}
     .posts-grid.stacked{display:flex;flex-direction:column;gap:16px}
     .posts-grid.grid{
-      display:grid;gap:16px;
-      grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+      display:grid;
+      gap:16px;
+      grid-template-columns:repeat(3, 1fr);  /* 3 kolumner på desktop */
     }
     @media (max-width:1024px){
-      .posts-grid.grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+      .posts-grid.grid{ grid-template-columns:repeat(2, 1fr); } /* 2 kolumner */
     }
     @media (max-width:640px){
-      .posts-grid.grid{grid-template-columns:1fr}
+      .posts-grid.grid{ grid-template-columns:1fr; } /* 1 kolumn */
     }
 
     /* Kort */
@@ -939,8 +948,9 @@
       const [authorFilter,setAuthorFilter] = useState('');
       const [resultCount,setResultCount] = useState(0);
 
-      /* NYTT: layoutläge (stacked/grid) med persistens */
-      const [layoutMode, setLayoutMode] = useState(() => localStorage.getItem('siteLayout') || 'stacked');
+      /* Layoutläge (stacked/grid) med persistens
+         Default = 'grid' för att visa 3 kolumner direkt */
+      const [layoutMode, setLayoutMode] = useState(() => localStorage.getItem('siteLayout') || 'grid');
       const changeLayout = (mode) => {
         setLayoutMode(mode);
         localStorage.setItem('siteLayout', mode);
