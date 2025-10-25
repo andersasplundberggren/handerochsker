@@ -276,7 +276,7 @@
     .modal-close:hover{background:#E4E6EB}
     .modal-body{padding:20px;overflow-y:auto}
     .confirm-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}
-    .danger-btn{background:var(--danger);color:var(--fff);border:none;padding:10px 16px;border-radius:10px;cursor:pointer;font-weight:700;font-size:15px;transition:.2s}
+    .danger-btn{background:var(--danger);color:#fff;border:none;padding:10px 16px;border-radius:10px;cursor:pointer;font-weight:700;font-size:15px;transition:.2s}
     .danger-btn:hover{background:#b91c1c}
     .ghost-btn{background:var(--bg-primary);border:none;padding:10px 16px;border-radius:10px;cursor:pointer;font-weight:700;font-size:15px;color:var(--text-primary);transition:.2s}
     .ghost-btn:hover{background:#E4E6EB}
@@ -336,7 +336,8 @@
         const url = new URL(CONFIG.API_URL);
         url.searchParams.set('path', path);
         Object.entries(params).forEach(([k, v]) => {
-          if (v !== null och v !== undefined) url.searchParams.set(k, String(v));
+          // FIX: 'och' -> '&&'
+          if (v !== null && v !== undefined) url.searchParams.set(k, String(v));
         });
         const res = await fetch(url.toString(), { method: 'GET', redirect: 'follow' });
         const text = await res.text();
@@ -383,7 +384,7 @@
     };
     const clamp = (s='', n=140) => s.length <= n ? s : s.slice(0, n-1) + '…';
 
-    // NYTT: Fullständigt namn (Förnamn Efternamn) från e-post
+    // Fullständigt namn (Förnamn Efternamn) från e-post
     const fullNameFromEmail = (email) => {
       const cap = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : '';
       const local = String(email || '').split('@')[0] || '';
@@ -485,9 +486,19 @@
               <div className="info-banner-text">All information som skrivs här (inlägg, kommentarer, reaktioner) samt uppgifter om vem som skriver lagras för demo/test.</div>
             </div>
             {showEmailInfo && (
-              <div className="info-banner" style="background:#E0E7FF;border-color:#C7D2FE;color:#1e1b4b">
-                <div className="info-banner-title" style="color:#4338CA">📧 Om inloggningskoden</div>
-                <div className="info-banner-text">Koden skickas via e-post och innehåller endast en 6-siffrig kod – inga länkar.</div>
+              <div
+                className="info-banner"
+                style={{background:'#E0E7FF', borderColor:'#C7D2FE', color:'#1e1b4b'}}
+              >
+                <div
+                  className="info-banner-title"
+                  style={{color:'#4338CA'}}
+                >
+                  📧 Om inloggningskoden
+                </div>
+                <div className="info-banner-text">
+                  Koden skickas via e-post och innehåller endast en 6-siffrig kod – inga länkar.
+                </div>
               </div>
             )}
           </div>
