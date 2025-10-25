@@ -148,6 +148,13 @@
 
     .user-line{display:flex;align-items:center;gap:10px;padding:8px;border-radius:10px;background:var(--bg-primary)}
     .user-avatar{width:28px;height:28px;border-radius:50%;background:var(--theme-primary);color:#fff;display:grid;place-items:center;font-weight:800}
+    /* Tydligare namn i menyn */
+    .user-line-name{
+      font-weight:900;
+      color:var(--text-primary);
+      font-size:16px;
+      letter-spacing:.2px;
+    }
 
     .pill-btn{background:var(--bg-primary);color:var(--text-primary);border:none;padding:10px 12px;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;transition:.2s}
     .pill-btn:hover{background:#E4E6EB}
@@ -372,6 +379,14 @@
       const local = String(email).split('@')[0] || '';
       const first = (local.split('.')[0] || local).replace(/[_-]+/g, ' ');
       return first.charAt(0).toUpperCase() + first.slice(1).toLowerCase();
+    };
+    // Ny: Fullständigt namn från fornamn.efternamn@karlskoga.se
+    const fullNameFromEmail = (email) => {
+      const cap = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : '';
+      const local = String(email || '').split('@')[0] || '';
+      const parts = local.split(/[._-]+/).filter(Boolean);
+      if (parts.length >= 2) return `${cap(parts[0])} ${cap(parts[1])}`;
+      return cap(parts[0] || '');
     };
     const clamp = (s='', n=140) => s.length <= n ? s : s.slice(0, n-1) + '…';
 
@@ -1030,9 +1045,9 @@
 
                 <div className="menu-section">
                   <div className="menu-label">Konto</div>
-                  <div className="user-line">
+                  <div className="user-line" title={session.email}>
                     <div className="user-avatar">{(session.email||'?')[0].toUpperCase()}</div>
-                    <div style={{fontWeight:800}}>{session.displayName || firstNameFromEmail(session.email)}</div>
+                    <div className="user-line-name">{fullNameFromEmail(session.email)}</div>
                   </div>
                   <button onClick={()=>{ setOpen(false); onLogout(); }} className="pill-btn logout-btn">Logga ut</button>
                 </div>
@@ -1150,7 +1165,6 @@
               <span className="tagline">Plattformen för initiativ</span>
             </a>
 
-            {/* HAMBURGER-MENY */}
             <HeaderMenu
               session={session}
               onNewPost={()=>setShowCreatePost(true)}
@@ -1171,122 +1185,4 @@
             />
 
             {hasActiveFilters && (
-              <div className="results-count">{loading ? 'Söker…' : `${resultCount} inlägg funna`}</div>
-            )}
-
-            {/* OBS! Skapa-kortet borttaget helt, endast headerknappen finns kvar */}
-
-            {loading ? (
-              <Loader text="Laddar…"/>
-            ) : posts.length===0 ? (
-              <div className="loader-text">Inga inlägg ännu. Var först ut!</div>
-            ) : (
-              <div className={`posts-grid ${layoutMode === 'grid' ? 'grid' : 'stacked'}`}>
-                {posts.map(post=>{
-                  const isAuthor = String(post.author_email||'').toLowerCase() === String(session.email||'').toLowerCase();
-                  return (
-                    <article key={post.post_id} className="post-card" onClick={(e) => openPost(post, e)} style={{cursor:'pointer'}}>
-                      <div className="post-header">
-                        <div className="post-avatar">{(post.author_email||'?')[0].toUpperCase()}</div>
-                        <div className="post-meta">
-                          <h2 className="post-title">{post.title || '(utan rubrik)'}</h2>
-                          <div className="post-author-info">
-                            <div title={post.author_email}>{firstNameFromEmail(post.author_email)}</div>
-                            <div>{new Date(post.created_at).toLocaleString('sv-SE')}</div>
-                            {post.category && (
-                              <div className="category-badge" style={{ backgroundColor: post.category.color || '#6B7280' }}>
-                                {post.category.name}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        {isAuthor && (
-                          <div style={{display:'flex',gap:4}}>
-                            <button className="pill-btn edit-btn" title="Redigera" onClick={(e)=>{e.stopPropagation(); handleEdit(post);}}>✏️</button>
-                            <button className="pill-btn delete-btn" title="Flytta till papperskorg" onClick={(e)=>{e.stopPropagation(); setPostToDelete(post); setConfirmOpen(true);}}>×</button>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="post-summary">{summaryOf(post)}</div>
-
-                      <ProgressBar progress={post.progress || 'planeras'} />
-
-                      <div className="post-actions" onClick={(e)=>e.stopPropagation()}>
-                        <ReactionBar post={post} session={session}/>
-                        <span className="comment-count">💬 {post.comments_count||0}</span>
-                      </div>
-                    </article>
-                  );
-                })}
-              </div>
-            )}
-          </main>
-
-          <CreateEditPostModal 
-            isOpen={showCreatePost} 
-            onClose={handleCloseModal} 
-            session={session} 
-            onSuccess={handleSuccess}
-            editPost={editingPost}
-          />
-          <TrashModal isOpen={showTrash} onClose={()=>setShowTrash(false)} session={session} onChanged={()=>loadPosts()}/>
-          <PostDetailModal 
-            isOpen={showPostDetail} 
-            onClose={()=>{setShowPostDetail(false); setSelectedPost(null);}} 
-            post={selectedPost} 
-            session={session}
-            onEdit={handleEdit}
-          />
-          <InfoModal isOpen={showInfo} onClose={() => setShowInfo(false)} showEmailInfo={false} />
-
-          <ConfirmModal
-            isOpen={confirmOpen}
-            title="Radera inlägg?"
-            message="Vill du verkligen radera inlägget? Det flyttas till papperskorgen och kan återställas."
-            confirmText="Ja, radera"
-            cancelText="Avbryt"
-            onConfirm={doDelete}
-            onCancel={()=>{ setConfirmOpen(false); setPostToDelete(null); }}
-          />
-        </>
-      );
-    }
-
-    /* ===== App ===== */
-    function App(){
-      const [session,setSession] = useState(null);
-      const [booting,setBooting] = useState(true);
-      
-      useEffect(()=>{
-        const savedTheme = localStorage.getItem('siteTheme') || 'blue';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        
-        const saved = localStorage.getItem(CONFIG.STORAGE_KEY);
-        if (saved) { 
-          try { setSession(JSON.parse(saved)); } 
-          catch { localStorage.removeItem(CONFIG.STORAGE_KEY); } 
-        }
-        setBooting(false);
-      },[]);
-      
-      const onLogin = (sess)=>{ 
-        setSession(sess); 
-        localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(sess)); 
-      };
-      
-      const onLogout = ()=>{ 
-        setSession(null); 
-        localStorage.removeItem(CONFIG.STORAGE_KEY); 
-      };
-      
-      if (booting) return <Loader text="Startar…"/>;
-      if (!session) return <LoginPage onLogin={onLogin}/>;
-      return <MainPage session={session} onLogout={onLogout}/>;
-    }
-
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App/>);
-  </script>
-</body>
-</html>
+              <div className="results-count">{loading ? 'Söker…' : `${resultCount} inlägg funna
