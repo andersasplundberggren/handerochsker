@@ -13,206 +13,317 @@
 
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
+    html { transition: background-color 0.3s ease; }
 
     :root{
-      --bg-primary:#F5F7FA;
+      /* Bakgrund */
+      --page-bg-1:#2b3350;
+      --page-bg-2:#222a42;
+      --theme-primary-rgb:88,99,199;
 
-      --glass-bg:rgba(255,255,255,.78);
-      --glass-border:rgba(255,255,255,.92);
-
-      --text-primary:#111827; /* mörkare för bättre kontrast */
-      --text-secondary:#475569; /* något mörkare sekundär */
-
-      --accent-blue:#5863C7;
-      --accent-purple:#7B68EE;
+      /* Ljus kort-/UI-palett */
+      --bg-primary:#F7F8FA;
+      --glass-bg:#FFFFFF;
+      --glass-border:#E4E6EB;
+      --text-primary:#050505;
+      --text-secondary:#65676B;
       --danger:#DC2626;
-
-      --shadow-sm:0 2px 8px rgba(0,0,0,.06);
-      --shadow-md:0 10px 28px rgba(0,0,0,.10);
-      --shadow-lg:0 28px 80px rgba(0,0,0,.18);
-
+      --shadow-sm:0 1px 2px rgba(0,0,0,.1);
+      --shadow-md:0 2px 4px rgba(0,0,0,.1);
+      --shadow-lg:0 8px 16px rgba(0,0,0,.15);
       --progress-planeras:#F59E0B;
       --progress-pilot:#3B82F6;
       --progress-driftsatt:#10B981;
+
+      /* Standard (Blå) */
+      --theme-primary:#5863C7;
+      --theme-primary-dark:#362E7D;
+      --theme-primary-light:#91A9FF;
+      --theme-tint1:#DBDEF4;
+      --theme-tint2:#EFF2FF;
+      --card-accent:rgba(88, 99, 199, 0.03);
     }
 
-    /* ===== Endast bakgrunden mörk ===== */
+    /* Teman */
+    [data-theme="blue"]{
+      --theme-primary:#5863C7; --theme-primary-dark:#362E7D; --theme-primary-light:#91A9FF;
+      --theme-tint1:#DBDEF4; --theme-tint2:#EFF2FF; --theme-primary-rgb:88,99,199;
+      --page-bg-1:#2b3350; --page-bg-2:#222a42; --bg-primary:#F7F8FA; --glass-bg:#FFFFFF;
+      --card-accent:rgba(88, 99, 199, 0.03);
+    }
+    [data-theme="green"]{
+      --theme-primary:#00A78B; --theme-primary-dark:#0F6F60; --theme-primary-light:#7AF3D7;
+      --theme-tint1:#D2EFE7; --theme-tint2:#EEFAF7; --theme-primary-rgb:0,167,139;
+      --page-bg-1:#274339; --page-bg-2:#1f372e; --bg-primary:#F2FCF9; --glass-bg:#FDFFFE;
+      --card-accent:rgba(0, 167, 139, 0.03);
+    }
+    [data-theme="purple"]{
+      --theme-primary:#9D3E9E; --theme-primary-dark:#622977; --theme-primary-light:#F5A7E8;
+      --theme-tint1:#ECD8EB; --theme-tint2:#FFF1FE; --theme-primary-rgb:157,62,158;
+      --page-bg-1:#3a2a48; --page-bg-2:#2f223b; --bg-primary:#FFF6FD; --glass-bg:#FFFEFF;
+      --card-accent:rgba(157, 62, 158, 0.03);
+    }
+    [data-theme="red"]{
+      --theme-primary:#D5422D; --theme-primary-dark:#89281F; --theme-primary-light:#FFA69B;
+      --theme-tint1:#FCDBDA; --theme-tint2:#FEEFEE; --theme-primary-rgb:213,66,45;
+      --page-bg-1:#442727; --page-bg-2:#362020; --bg-primary:#FFF4F4; --glass-bg:#FFFCFC;
+      --card-accent:rgba(213, 66, 45, 0.03);
+    }
+    [data-theme="gray"]{
+      --theme-primary:#48606B; --theme-primary-dark:#2A2F31; --theme-primary-light:#88A8B5;
+      --theme-tint1:#DBDFE0; --theme-tint2:#EFF3F4; --theme-primary-rgb:72,96,107;
+      --page-bg-1:#2a3239; --page-bg-2:#232a31; --bg-primary:#F6FAFB; --glass-bg:#FAFBFB;
+      --card-accent:rgba(72, 96, 107, 0.03);
+    }
+
+    /* Bakgrund (temaanpassad) */
     body{
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,sans-serif;
-      background:linear-gradient(135deg,#0B1220,#0A1A3C);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      background:
+        radial-gradient(1100px 520px at 10% -10%, rgba(var(--theme-primary-rgb),0.06), transparent 60%),
+        linear-gradient(180deg, var(--page-bg-1), var(--page-bg-2));
       min-height:100vh;
-      color:var(--text-primary);
+      color:#E9EEF5;
       -webkit-font-smoothing:antialiased;
-      overflow-x:hidden
+      overflow-x:hidden;
+      transition:background 0.3s ease, color .2s ease;
     }
-    body::before,body::after{
-      content:"";position:fixed;border-radius:50%;filter:blur(80px);opacity:.22;z-index:0;animation:float 20s ease-in-out infinite
-    }
-    body::before{width:600px;height:600px;background:radial-gradient(circle,var(--accent-blue),transparent 70%);top:-200px;right:-200px}
-    body::after{width:500px;height:500px;background:radial-gradient(circle,var(--accent-purple),transparent 70%);bottom:-150px;left:-150px;animation-delay:-10s}
-    @keyframes float{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(50px,-50px) scale(1.1)}66%{transform:translate(-30px,30px) scale(.9)}}
 
-    /* ===== Ljusa/glas-block ===== */
-    .glass-header{
-      position:sticky;top:20px;max-width:1200px;margin:20px auto;padding:16px 24px;background:var(--glass-bg);
-      backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);
-      border:1px solid var(--glass-border);border-radius:20px;box-shadow:var(--shadow-md);
-      display:flex;align-items:center;justify-content:space-between;z-index:100;transition:.3s
+    /* Korten behåller ljus design */
+    .post-card, .login-card, .search-filters, .trash-item, .modal-content, .results-count {
+      color: var(--text-primary);
     }
-    .glass-header:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px)}
+
+    /* ===== Header ===== */
+    .glass-header{
+      position:sticky;top:0;max-width:100%;margin:0;padding:12px 16px;background:var(--glass-bg);
+      border-bottom:1px solid var(--glass-border);
+      display:flex;align-items:center;justify-content:space-between;z-index:100;transition:.3s;
+      box-shadow:var(--shadow-sm);
+    }
+    .glass-header:hover{box-shadow:var(--shadow-md)}
     .logo-area{display:flex;align-items:center;gap:14px;text-decoration:none}
-    .logo-img{height:36px;transition:.3s}
+    .logo-img{height:40px;transition:.3s}
     .logo-area:hover .logo-img{transform:scale(1.05)}
-    .tagline{font-size:14px;font-weight:600;color:var(--text-secondary);letter-spacing:-.1px}
-    .user-info{display:flex;align-items:center;gap:12px}
-    .user-name{font-size:14px;color:var(--text-secondary)}
-    .pill-btn{background:transparent;color:var(--text-secondary);border:1px solid rgba(0,0,0,.12);padding:8px 14px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;transition:.2s}
-    .pill-btn:hover{color:#111827;border-color:rgba(0,0,0,.22);background:rgba(0,0,0,.03)}
-    .logout-btn:hover{color:var(--danger);border-color:rgba(220,38,38,.3);background:rgba(220,38,38,.05)}
+    .tagline{font-size:15px;font-weight:600;color:var(--text-secondary)}
+
+    /* Hamburgermeny */
+    .hamburger-btn{
+      background:var(--bg-primary);
+      border:none;
+      width:40px;height:40px;border-radius:10px;
+      display:grid;place-items:center;
+      cursor:pointer;transition:.2s;
+      color:var(--text-primary);
+      box-shadow:var(--shadow-sm);
+    }
+    .hamburger-btn:hover{background:#E4E6EB}
+    .hamburger-icon{
+      width:18px;height:14px;position:relative;
+    }
+    .hamburger-icon::before,.hamburger-icon::after,.hamburger-icon div{
+      content:"";position:absolute;left:0;right:0;height:2px;background:var(--text-primary);border-radius:2px
+    }
+    .hamburger-icon div{top:6px}
+    .hamburger-icon::before{top:0}
+    .hamburger-icon::after{bottom:0}
+
+    .menu-overlay{
+      position:fixed;inset:0;background:transparent;z-index:120;
+    }
+    .menu-panel{
+      position:absolute;right:8px;top:60px;
+      background:var(--glass-bg);
+      border:1px solid var(--glass-border);
+      border-radius:12px;
+      box-shadow:0 10px 24px rgba(0,0,0,.18), 0 2px 6px rgba(0,0,0,.08);
+      width:min(92vw, 380px);
+      padding:12px;
+      z-index:130;
+    }
+    .menu-section{display:grid;gap:10px;margin:8px 0}
+    .menu-row{display:flex;gap:8px;align-items:center}
+    .menu-divider{height:1px;background:var(--glass-border);margin:8px 0}
+    .menu-label{font-size:12px;color:var(--text-secondary);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+
+    .user-line{display:flex;align-items:center;gap:10px;padding:8px;border-radius:10px;background:var(--bg-primary)}
+    .user-avatar{width:28px;height:28px;border-radius:50%;background:var(--theme-primary);color:#fff;display:grid;place-items:center;font-weight:800}
+
+    /* Tydligare namn i menyn */
+    .user-line-name{
+      font-weight: 900;
+      color: var(--text-primary);
+      font-size: 16px;
+      letter-spacing: .2px;
+    }
+
+    .pill-btn{background:var(--bg-primary);color:var(--text-primary);border:none;padding:10px 12px;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;transition:.2s}
+    .pill-btn:hover{background:#E4E6EB}
+    .logout-btn:hover{color:var(--danger);background:rgba(220,38,38,.1)}
+    .info-btn{background:var(--bg-primary);border:none;width:38px;height:38px;border-radius:10px;display:grid;place-items:center;cursor:pointer;font-size:16px;transition:.2s;color:var(--text-primary)}
+    .info-btn:hover{background:#E4E6EB}
+    .header-select { width:100%; }
+
+    /* "Nytt inlägg" – tydlig */
+    .primary-btn{background:var(--theme-primary);color:#fff;border:none;padding:12px 18px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;transition:.2s}
+    .primary-btn:hover{background:var(--theme-primary-dark)}
+    .primary-btn:disabled{opacity:.5;cursor:not-allowed}
+    .primary-btn.header-cta{
+      display:flex;align-items:center;gap:8px;justify-content:center;
+      padding:12px 16px;border-radius:12px;
+      box-shadow:0 10px 24px rgba(var(--theme-primary-rgb), .35), 0 2px 6px rgba(0,0,0,.08);
+      letter-spacing:.2px;width:100%;
+    }
+    .primary-btn.header-cta:hover{
+      transform:translateY(-1px);
+      box-shadow:0 14px 30px rgba(var(--theme-primary-rgb), .45), 0 4px 10px rgba(0,0,0,.10);
+    }
 
     .login-container{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px;position:relative;z-index:1}
-    .login-card{background:var(--glass-bg);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);
-      border:1px solid var(--glass-border);border-radius:28px;padding:44px 40px;box-shadow:var(--shadow-lg);text-align:center;max-width:520px;width:100%;transition:.3s}
-    .login-card:hover{transform:translateY(-6px);box-shadow:0 30px 80px rgba(0,0,0,.18)}
-    .login-logo{height:96px;margin-bottom:20px;filter:drop-shadow(0 10px 40px rgba(0,0,0,.1))}
-    .login-title{font-size:28px;font-weight:800;color:var(--text-primary);margin-bottom:8px;letter-spacing:-.5px}
+    .login-card{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:8px;padding:40px;box-shadow:var(--shadow-lg);text-align:center;max-width:450px;width:100%;transition:.3s}
+    .login-card:hover{transform:translateY(-4px);box-shadow:0 12px 24px rgba(0,0,0,.2)}
+    .login-logo{height:80px;margin-bottom:16px}
+    .login-title{font-size:28px;font-weight:600;color:var(--text-primary);margin-bottom:8px}
     .login-subtitle{font-size:15px;color:var(--text-secondary);margin-bottom:24px}
     .login-form{display:flex;flex-direction:column;gap:16px}
     .form-group{text-align:left}
-    .form-label{display:block;font-weight:700;margin-bottom:8px;color:var(--text-primary);font-size:13px}
+    .form-label{display:block;font-weight:600;margin-bottom:6px;color:var(--text-primary);font-size:15px}
     .form-input,.search-input,.filter-select,.file-input{
-      width:100%;padding:14px 16px;border:1px solid rgba(0,0,0,.12);border-radius:14px;font-size:15px;background:rgba(255,255,255,.9);transition:.2s;font-family:inherit
+      width:100%;padding:12px 16px;border:1px solid var(--glass-border);border-radius:10px;font-size:15px;background:var(--glass-bg);transition:.2s;font-family:inherit
     }
     textarea.form-input{min-height:120px}
-    .form-input:focus,.search-input:focus,.filter-select:focus{outline:none;border-color:var(--accent-blue);background:rgba(255,255,255,.98);box-shadow:0 0 0 3px rgba(88,99,199,.15)}
-    .form-input.otp-input{text-align:center;font-size:24px;letter-spacing:4px;font-weight:800}
-    .primary-btn{background:linear-gradient(135deg,var(--accent-blue),var(--accent-purple));color:#fff;border:none;padding:12px 18px;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;transition:.2s;box-shadow:0 8px 24px rgba(88,99,199,.28)}
-    .primary-btn:hover{transform:translateY(-1px);box-shadow:0 12px 32px rgba(123,104,238,.36)}
-    .primary-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
-    .secondary-btn{background:transparent;color:var(--text-secondary);border:none;padding:10px;font-size:13px;cursor:pointer;font-weight:700}
-    .success-message{background:linear-gradient(135deg,#D4F4E7,#C0F0DC);color:#065F46;padding:10px 12px;border-radius:10px;margin-bottom:6px;font-size:13px;font-weight:800}
-    .error-message{background:linear-gradient(135deg,#FEE2E2,#FECACA);color:var(--danger);padding:10px 12px;border-radius:10px;margin-bottom:6px;font-size:13px;font-weight:800}
+    .form-input:focus,.search-input:focus,.filter-select:focus{outline:none;border-color:var(--theme-primary);background:var(--glass-bg);box-shadow:0 0 0 2px rgba(var(--theme-primary-rgb),.1)}
+    .form-input.otp-input{text-align:center;font-size:24px;letter-spacing:8px;font-weight:600}
+    .secondary-btn{background:var(--bg-primary);color:var(--text-primary);border:none;padding:12px 18px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;transition:.2s}
+    .secondary-btn:hover{background:#E4E6EB}
+    .success-message{background:#D4F4E7;color:#065F46;padding:12px;border-radius:10px;margin-bottom:12px;font-size:15px;font-weight:600}
+    .error-message{background:#FEE2E2;color:var(--danger);padding:12px;border-radius:10px;margin-bottom:12px;font-size:15px;font-weight:600}
 
-    .loader{display:flex;flex-direction:column;align-items:center;gap:10px;padding:40px}
-    .spinner{width:28px;height:28px;border-radius:50%;border:3px solid rgba(0,0,0,.15);border-top-color:var(--accent-blue);animation:spin .8s linear infinite}
+    .loader{display:flex;flex-direction:column;align-items:center;gap:12px;padding:40px}
+    .spinner{width:32px;height:32px;border-radius:50%;border:3px solid var(--glass-border);border-top-color:var(--theme-primary);animation:spin .8s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
-    .loader-text{color:var(--text-secondary);font-size:14px;text-align:center;background:var(--glass-bg);border:1px solid var(--glass-border);padding:6px 10px;border-radius:10px}
+    .loader-text{color:#CBD5E1;font-size:15px;text-align:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);padding:8px 12px;border-radius:10px}
 
-    .main-container{max-width:1200px;margin:0 auto;padding:0 32px 80px;position:relative;z-index:1}
-    .search-filters{background:var(--glass-bg);backdrop-filter:blur(20px) saturate(180%);border:1px solid var(--glass-border);border-radius:22px;padding:20px;box-shadow:var(--shadow-sm);margin-bottom:20px}
+    /* Huvudlayout */
+    .main-container{
+      max-width:1200px;
+      margin:0 auto;
+      padding:16px 16px 80px;
+      position:relative;
+      z-index:1;
+    }
+
+    .search-filters{
+      background:linear-gradient(to bottom, var(--glass-bg), var(--glass-bg)),
+                 linear-gradient(135deg, var(--card-accent), transparent);
+      background-blend-mode:normal;border:1px solid var(--glass-border);
+      border-radius:12px;padding:16px;box-shadow:var(--shadow-sm);margin-bottom:16px
+    }
     .search-row{display:grid;grid-template-columns:1fr 220px 220px auto;gap:12px;align-items:end}
-    .clear-btn{background:var(--accent-blue);color:#fff;border:none;padding:12px 16px;border-radius:12px;font-size:13px;font-weight:800;cursor:pointer}
-    .results-count{text-align:center;color:var(--text-secondary);font-size:13px;margin:10px 0 6px;background:var(--glass-bg);border:1px solid var(--glass-border);display:inline-block;padding:6px 10px;border-radius:10px}
+    .clear-btn{background:var(--theme-primary);color:#fff;border:none;padding:12px 16px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;transition:.2s}
+    .clear-btn:hover{background:var(--theme-primary-dark)}
+    .results-count{text-align:center;color:var(--text-secondary);font-size:15px;margin:16px 0;background:var(--glass-bg);border:1px solid var(--glass-border);display:inline-block;padding:12px 16px;border-radius:12px;width:100%}
 
-    .create-post-card{background:var(--glass-bg);backdrop-filter:blur(20px) saturate(180%);border:1px solid var(--glass-border);border-radius:22px;padding:18px;box-shadow:var(--shadow-sm);margin:14px 0;cursor:pointer;transition:.2s}
-    .create-post-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
-    .create-post-prompt{color:var(--text-secondary);font-size:15px;text-align:left}
+    /* LIST-LAYOUTER */
+    .posts-grid{margin-top:0}
+    .posts-grid.stacked{display:flex;flex-direction:column;gap:16px}
+    .posts-grid.grid{display:grid;gap:16px;grid-template-columns:repeat(3, 1fr)}
+    @media (max-width:1024px){.posts-grid.grid{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:640px){.posts-grid.grid{grid-template-columns:1fr}}
 
-    .posts-grid{display:grid;gap:18px;margin-top:8px;grid-template-columns:repeat(3,1fr)}
-    @media (max-width:1024px){.posts-grid{grid-template-columns:repeat(2,1fr)}}
-    @media (max-width:640px){.posts-grid{grid-template-columns:1fr}}
-
-    /* Kort: förbättrad läsbarhet */
-    .post-card{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:18px;padding:18px;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;min-height:180px;transition:.2s}
-    .post-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
-    .post-header{display:flex;gap:12px;align-items:center;margin-bottom:8px}
-    .post-avatar{width:36px;height:36px;border-radius:50%;background:#e5e7eb;color:#111827;display:grid;place-items:center;font-weight:800;font-size:14px}
+    /* Kort */
+    .post-card{
+      background:linear-gradient(to bottom, var(--glass-bg), var(--glass-bg)),
+                 linear-gradient(135deg, var(--card-accent), transparent);
+      background-blend-mode:normal;border:1px solid var(--glass-border);
+      border-radius:12px;padding:0;box-shadow:var(--shadow-sm);
+      display:flex;flex-direction:column;min-height:auto;transition:.2s
+    }
+    .post-card:hover{box-shadow:var(--shadow-md)}
+    .post-header{display:flex;gap:12px;align-items:center;margin-bottom:0;padding:12px 16px}
+    .post-avatar{width:40px;height:40px;border-radius:50%;background:var(--theme-primary);color:#fff;display:grid;place-items:center;font-weight:600;font-size:16px}
     .post-meta{display:grid;gap:4px;flex:1}
-    .post-title{font-size:18px;letter-spacing:-.2px;font-weight:800;color:#0f172a}
-    .post-author-info{display:flex;gap:10px;align-items:center;flex-wrap:wrap;color:var(--text-secondary);font-size:12px}
-    .category-badge{padding:3px 8px;border-radius:999px;color:#fff;font-size:11px;font-weight:900;letter-spacing:.3px}
-    .post-summary{margin-top:8px;color:#1F2937;line-height:1.6;letter-spacing:-.1px;font-size:15px}
+    .post-title{font-size:18px;letter-spacing:0;font-weight:600;color:var(--text-primary);padding:0 16px 8px}
+    .post-author-info{display:flex;gap:8px;align-items:center;flex-wrap:wrap;color:var(--text-secondary);font-size:13px}
+    .category-badge{padding:3px 8px;border-radius:4px;color:#fff;font-size:12px;font-weight:600}
+    .post-summary{margin:0;padding:0 16px 12px;color:var(--text-primary);line-height:1.5;letter-spacing:0;font-size:15px}
 
-    .post-actions{display:flex;align-items:center;gap:10px;margin-top:auto;padding-top:12px}
-    .action-btn{background:transparent;border:1px solid rgba(0,0,0,.12);padding:6px 10px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:700;transition:.2s}
-    .action-btn:hover{background:rgba(0,0,0,.03)}
-    .action-btn.liked{background:#fee2e2;border-color:#fecaca;color:#dc2626}
-    .comment-count{color:var(--text-secondary);font-size:12px}
-    .delete-btn{border-color:rgba(220,38,38,.3);color:var(--danger)}
-    .delete-btn:hover{background:rgba(220,38,38,.06)}
-    .edit-btn{border-color:rgba(88,99,199,.3);color:var(--accent-blue)}
-    .edit-btn:hover{background:rgba(88,99,199,.06)}
+    .post-actions{display:flex;align-items:center;gap:4px;margin-top:auto;padding:4px 0 0;border-top:1px solid var(--glass-border)}
+    .action-btn{background:transparent;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:15px;font-weight:600;transition:.2s;flex:1;color:var(--text-secondary)}
+    .action-btn:hover{background:var(--bg-primary)}
+    .action-btn.liked{color:var(--theme-primary)}
+    .comment-count{color:var(--text-secondary);font-size:15px;padding:8px 12px;font-weight:600}
+    .delete-btn{border:none;color:var(--danger);background:var(--bg-primary);padding:6px 10px;border-radius:8px;font-size:20px;line-height:1}
+    .delete-btn:hover{background:#E4E6EB}
+    .edit-btn{border:none;color:var(--theme-primary);background:var(--bg-primary);padding:6px 10px;border-radius:8px;font-size:16px;line-height:1}
+    .edit-btn:hover{background:#E4E6EB}
 
-    /* Progress: tydligare */
-    .progress-wrap{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid rgba(0,0,0,.08)}
-    .progress-chip{font-size:11px;font-weight:900;padding:4px 8px;border-radius:999px;color:#0b1220;background:#e2e8f0;border:1px solid rgba(0,0,0,.06)}
-    .progress-bar{flex:1;height:10px;background:rgba(0,0,0,.08);border-radius:999px;overflow:hidden;position:relative;box-shadow:inset 0 1px 2px rgba(0,0,0,.08)}
+    .progress-wrap{display:flex;align-items:center;gap:8px;margin:0;padding:8px 16px 12px;border-top:none}
+    .progress-chip{font-size:12px;font-weight:700;padding:4px 8px;border-radius:6px;color:#fff;border:none;background:#111827}
+    .progress-bar{flex:1;height:10px;background:var(--bg-primary);border-radius:999px;overflow:hidden}
     .progress-stages{display:flex;height:100%}
-    .progress-stage{flex:1;opacity:.25;transition:.2s}
+    .progress-stage{flex:1;opacity:.3;transition:.2s}
     .progress-stage.planeras{background:var(--progress-planeras)}
     .progress-stage.pilot{background:var(--progress-pilot)}
     .progress-stage.driftsatt{background:var(--progress-driftsatt)}
-    .progress-stage.active{opacity:1;box-shadow:inset 0 0 0 1px rgba(255,255,255,.6)}
+    .progress-stage.active{opacity:1}
 
-    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.3);display:grid;place-items:center;z-index:200;backdrop-filter:blur(4px)}
-    .modal-content{width:min(720px,92vw);background:#fff;border-radius:16px;overflow:hidden;box-shadow:var(--shadow-lg);max-height:90vh;display:flex;flex-direction:column}
-    .modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #e5e7eb}
-    .modal-title{font-size:18px;font-weight:800}
-    .modal-close{border:none;background:transparent;font-size:28px;cursor:pointer;color:var(--text-secondary);line-height:1;padding:0;width:32px;height:32px}
-    .modal-close:hover{color:var(--text-primary)}
+    .modal-overlay{position:fixed;inset:0;background:rgba(255,255,255,.8);display:grid;place-items:center;z-index:200;backdrop-filter:blur(4px)}
+    .modal-content{width:min(700px,92vw);background:var(--glass-bg);border-radius:12px;overflow:hidden;box-shadow:0 12px 28px rgba(0,0,0,.15);max-height:90vh;display:flex;flex-direction:column}
+    .modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--glass-border)}
+    .modal-title{font-size:20px;font-weight:700;color:var(--text-primary)}
+    .modal-close{border:none;background:var(--bg-primary);font-size:24px;cursor:pointer;color:var(--text-secondary);line-height:1;padding:0;width:40px;height:40px;border-radius:10px;display:grid;place-items:center;transition:.2s}
+    .modal-close:hover{background:#E4E6EB}
     .modal-body{padding:20px;overflow-y:auto}
-    .confirm-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
-    .danger-btn{background:var(--danger);color:#fff;border:none;padding:10px 16px;border-radius:10px;cursor:pointer;font-weight:800}
+    .confirm-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}
+    .danger-btn{background:var(--danger);color:#fff;border:none;padding:10px 16px;border-radius:10px;cursor:pointer;font-weight:700;font-size:15px;transition:.2s}
     .danger-btn:hover{background:#b91c1c}
-    .ghost-btn{background:#f3f4f6;border:none;padding:10px 16px;border-radius:10px;cursor:pointer;font-weight:800}
-    .ghost-btn:hover{background:#e5e7eb}
+    .ghost-btn{background:var(--bg-primary);border:none;padding:10px 16px;border-radius:10px;cursor:pointer;font-weight:700;font-size:15px;color:var(--text-primary);transition:.2s}
+    .ghost-btn:hover{background:#E4E6EB}
 
     .trash-list{display:grid;gap:10px}
-    .trash-item{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;border:1px solid #e5e7eb;border-radius:10px;padding:12px}
-    .small-muted{font-size:12px;color:var(--text-secondary);margin-top:4px}
+    .trash-item{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;border:1px solid var(--glass-border);border-radius:10px;padding:12px;background:var(--glass-bg)}
+    .small-muted{font-size:13px;color:var(--text-secondary);margin-top:4px}
 
-    .charline{display:flex;justify-content:space-between;font-size:12px;color:var(--text-secondary);margin-top:6px}
+    .charline{display:flex;justify-content:space-between;font-size:13px;color:var(--text-secondary);margin-top:6px}
 
     .post-detail-modal .modal-body{max-height:70vh;overflow-y:auto}
-    .post-detail-content{line-height:1.7;white-space:pre-wrap;color:#1F2937}
-    .post-detail-meta{padding:16px;background:#f9fafb;border-radius:12px;margin-bottom:16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+    .post-detail-content{line-height:1.6;white-space:pre-wrap;color:var(--text-primary);font-size:15px}
+    .post-detail-meta{padding:16px;background:var(--bg-primary);border-radius:12px;margin-bottom:16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
     .post-detail-images{display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:12px;margin:16px 0}
-    .post-detail-image{width:100%;border-radius:8px;cursor:pointer;transition:.2s}
+    .post-detail-image{width:100%;border-radius:12px;cursor:pointer;transition:.2s}
     .post-detail-image:hover{transform:scale(1.02);box-shadow:var(--shadow-md)}
 
     .progress-selector{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
-    .progress-option{padding:12px;border:2px solid rgba(0,0,0,.1);border-radius:10px;text-align:center;cursor:pointer;transition:.2s;font-weight:800;font-size:13px}
-    .progress-option:hover{border-color:rgba(0,0,0,.2);background:rgba(0,0,0,.02)}
+    .progress-option{padding:12px;border:2px solid var(--glass-border);border-radius:10px;text-align:center;cursor:pointer;transition:.2s;font-weight:700;font-size:15px}
+    .progress-option:hover{border-color:var(--theme-primary);background:var(--theme-tint2)}
     .progress-option.selected{border-color:currentColor;background:currentColor;color:#fff}
     .progress-option.planeras{color:var(--progress-planeras)}
     .progress-option.pilot{color:var(--progress-pilot)}
     .progress-option.driftsatt{color:var(--progress-driftsatt)}
 
-    .info-banner{background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:2px solid #F59E0B;border-radius:16px;padding:16px;margin-bottom:20px;box-shadow:0 4px 12px rgba(245,158,11,0.2)}
-    .info-banner-title{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:900;color:#92400E;margin-bottom:8px}
-    .info-banner-text{font-size:14px;line-height:1.6;color:#78350F;margin-bottom:6px}
-    .info-banner-text strong{font-weight:900;color:#92400E}
-    .info-btn{position:relative;background:rgba(255,255,255,0.35);border:1px solid rgba(0,0,0,0.12);width:32px;height:32px;border-radius:50%;display:grid;place-items:center;cursor:pointer;transition:0.2s;font-size:16px;font-weight:900;color:var(--accent-blue)}
-    .info-btn:hover{background:rgba(255,255,255,0.6);transform:scale(1.08)}
-    .info-modal-content{line-height:1.7;color:#374151}
-    .info-modal-content p{margin-bottom:12px}
-    .info-modal-content strong{color:#1F2937;font-weight:900}
-    .info-highlight{background:#FEF3C7;padding:12px 16px;border-radius:8px;border-left:3px solid #F59E0B;margin:12px 0;font-size:14px}
+    .info-banner{background:#FEF3C7;border:1px solid #F59E0B;border-radius:12px;padding:16px;margin-bottom:16px;color:#78350F}
+    .info-banner-title{display:flex;align-items:center;gap:8px;font-size:17px;font-weight:700;color:#92400E;margin-bottom:8px}
+    .info-banner-text{font-size:15px;line-height:1.6;margin-bottom:6px}
   </style>
 </head>
 <body>
   <div id="root"></div>
 
   <script type="text/babel">
-    const { useState, useEffect, useCallback } = React;
+    const { useState, useEffect, useCallback, useRef } = React;
 
     /* =======================
-       KONFIG (BYT HÄR VID FLYTT)
-       =======================
-       TODO: 1) API_URL – byt till din nya Apps Script Web App URL
-             2) ALLOWED_EMAIL_DOMAIN – byt om du vill tillåta annan domän
-             3) STORAGE_KEY – om du vill separera sessioner mellan miljöer
-             4) LOGO_SRC – byt bildsökväg om logotypen ligger annorlunda
-    */
-   const CONFIG = {
-  API_URL: 'https://script.google.com/macros/s/AKfycbw7OvdjygHoFhu_Z1HAapi0bt7Ra7KbaoWDPfDgD1Cy-82IxJQ0s-t4lji9bPdCdvI/exec',
-  ALLOWED_EMAIL_DOMAIN: 'karlskoga.se',
-  STORAGE_KEY: 'karlskoga_session',
-  LOGO_SRC: './hander_och_sker.png'
-};
+       KONFIG
+       ======================= */
+    const CONFIG = {
+      API_URL: 'https://script.google.com/macros/s/AKfycbw7OvdjygHoFhu_Z1HAapi0bt7Ra7KbaoWDPfDgD1Cy-82IxJQ0s-t4lji9bPdCdvI/exec',
+      ALLOWED_EMAIL_DOMAIN: 'karlskoga.se',
+      STORAGE_KEY: 'karlskoga_session',
+      LOGO_SRC: './hander_och_sker.png'
+    };
 
-
-    /* Progress-steg (håll i sync med backend) */
+    /* Progress-steg */
     const PROGRESS_STAGES = {
       planeras: { label: 'Planeras', color: '#F59E0B', icon: '📋' },
       pilot: { label: 'Pilot', color: '#3B82F6', icon: '🧪' },
@@ -225,6 +336,7 @@
         const url = new URL(CONFIG.API_URL);
         url.searchParams.set('path', path);
         Object.entries(params).forEach(([k, v]) => {
+          // FIX: 'och' -> '&&'
           if (v !== null && v !== undefined) url.searchParams.set(k, String(v));
         });
         const res = await fetch(url.toString(), { method: 'GET', redirect: 'follow' });
@@ -262,7 +374,6 @@
     const isAllowedEmail = (email) => {
       if (!email) return false;
       const e = String(email).trim().toLowerCase();
-      // TODO: vill du ta bort punkt-kravet? Byt till: return e.endsWith('@' + CONFIG.ALLOWED_EMAIL_DOMAIN);
       return e.endsWith('@' + CONFIG.ALLOWED_EMAIL_DOMAIN) && e.split('@')[0].includes('.');
     };
     const firstNameFromEmail = (email) => {
@@ -273,7 +384,18 @@
     };
     const clamp = (s='', n=140) => s.length <= n ? s : s.slice(0, n-1) + '…';
 
-    /* ===== Progress Bar (tydligare) ===== */
+    // Fullständigt namn (Förnamn Efternamn) från e-post
+    const fullNameFromEmail = (email) => {
+      const cap = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : '';
+      const local = String(email || '').split('@')[0] || '';
+      const parts = local.split(/[._-]+/).filter(Boolean);
+      if (parts.length >= 2) {
+        return `${cap(parts[0])} ${cap(parts[1])}`;
+      }
+      return cap(parts[0] || '');
+    };
+
+    /* ===== Progress Bar ===== */
     function ProgressBar({ progress }) {
       const stages = ['planeras', 'pilot', 'driftsatt'];
       const currentIndex = Math.max(0, stages.indexOf(progress || 'planeras'));
@@ -359,14 +481,24 @@
         <Modal isOpen={isOpen} onClose={onClose} title="ℹ️ Om den här sidan">
           <div className="info-modal-content">
             <p><strong>Detta är ett proof of concept</strong> – en testversion av en plattform för att dela initiativ.</p>
-            <div className="info-highlight">
-              <strong>⚠️ Viktig information om data:</strong><br/>
-              All information som skrivs här (inlägg, kommentarer, reaktioner) samt uppgifter om vem som skriver lagras för demo/test.
+            <div className="info-banner">
+              <div className="info-banner-title">⚠️ Viktig information om data</div>
+              <div className="info-banner-text">All information som skrivs här (inlägg, kommentarer, reaktioner) samt uppgifter om vem som skriver lagras för demo/test.</div>
             </div>
             {showEmailInfo && (
-              <div className="info-highlight" style={{background:'#E0E7FF',borderLeftColor:'#5863C7'}}>
-                <strong>📧 Om inloggningskoden:</strong><br/>
-                Koden skickas via e-post och innehåller endast en 6-siffrig kod – inga länkar.
+              <div
+                className="info-banner"
+                style={{background:'#E0E7FF', borderColor:'#C7D2FE', color:'#1e1b4b'}}
+              >
+                <div
+                  className="info-banner-title"
+                  style={{color:'#4338CA'}}
+                >
+                  📧 Om inloggningskoden
+                </div>
+                <div className="info-banner-text">
+                  Koden skickas via e-post och innehåller endast en 6-siffrig kod – inga länkar.
+                </div>
               </div>
             )}
           </div>
@@ -421,11 +553,7 @@
               <div className="info-banner-text">Detta är en testversion. Data lagras för demonstrationssyfte.</div>
               <button 
                 onClick={() => setShowInfo(true)}
-                style={{
-                  background:'transparent',border:'none',color:'#92400E',
-                  textDecoration:'underline',cursor:'pointer',fontSize:13,fontWeight:800,
-                  padding:0,marginTop:4
-                }}
+                style={{background:'transparent',border:'none',color:'#92400E',textDecoration:'underline',cursor:'pointer',fontSize:13,fontWeight:800,padding:0,marginTop:4}}
               >
                 Läs mer →
               </button>
@@ -605,7 +733,7 @@
       );
     }
 
-    /* ===== Reaktioner (fixad: user_email) ===== */
+    /* ===== Reaktioner ===== */
     function ReactionBar({ post, session, onUpdate }) {
       const [count,setCount] = useState(0);
       const [hasLiked,setHasLiked] = useState(false);
@@ -615,7 +743,6 @@
         const res = await api.get('post/reactions',{ postId: post.post_id, session: session.sessionToken });
         if (res.success) {
           setCount((res.counts && res.counts.like) || 0);
-          // FIX: backend returnerar user_email (inte userEmail)
           setHasLiked((res.reactions||[]).some(r => String(r.user_email).toLowerCase()===String(session.email).toLowerCase() && r.type==='like'));
         }
       },[post.post_id,session.email,session.sessionToken]);
@@ -755,12 +882,12 @@
 
             <form onSubmit={submitComment} style={{display:'flex',gap:8,marginTop:12}}>
               <input type="text" value={commentText} onChange={(e) => setCommentText(e.target.value)} placeholder="Skriv en kommentar..." disabled={submitting}
-                style={{flex:1,padding:'10px 14px',border:'1px solid rgba(0,0,0,.12)',borderRadius:10,fontSize:14,background:'rgba(255,255,255,.98)',transition:'.2s'}}
-                onFocus={(e) => { e.target.style.borderColor = 'var(--accent-blue)'; e.target.style.boxShadow = '0 0 0 3px rgba(88,99,199,.15)'; }}
+                style={{flex:1,padding:'10px 14px',border:'1px solid rgba(0,0,0,.12)',borderRadius:10,fontSize:14,background:'rgba(255,255,255,.98)',transition:'0.2s'}}
+                onFocus={(e) => { e.target.style.borderColor = '#5863C7'; e.target.style.boxShadow = '0 0 0 3px rgba(88,99,199,.15)'; }}
                 onBlur={(e) => { e.target.style.borderColor = 'rgba(0,0,0,.12)'; e.target.style.boxShadow = 'none'; }}
               />
               <button type="submit" disabled={!commentText.trim() || submitting}
-                style={{border:'none',padding:'10px 16px',borderRadius:10,background: commentText.trim() && !submitting ? 'var(--accent-blue)' : '#d1d5db',color:'#fff',fontWeight:800,cursor: commentText.trim() && !submitting ? 'pointer' : 'not-allowed',fontSize:14,transition:'.2s'}}
+                style={{border:'none',padding:'10px 16px',borderRadius:10,background: commentText.trim() && !submitting ? '#5863C7' : '#d1d5db',color:'#fff',fontWeight:800,cursor: commentText.trim() && !submitting ? 'pointer' : 'not-allowed',fontSize:14,transition:'0.2s'}}
               >
                 {submitting ? 'Skickar...' : 'Skicka'}
               </button>
@@ -825,6 +952,127 @@
       );
     }
 
+    /* ===== Dropdown: Tema ===== */
+    function ThemeDropdown(){
+      const [currentTheme, setCurrentTheme] = useState(() => {
+        const saved = localStorage.getItem('siteTheme') || 'blue';
+        document.documentElement.setAttribute('data-theme', saved);
+        return saved;
+      });
+
+      const changeTheme = (themeId) => {
+        setCurrentTheme(themeId);
+        localStorage.setItem('siteTheme', themeId);
+        document.documentElement.setAttribute('data-theme', themeId);
+        window.getComputedStyle(document.documentElement).getPropertyValue('--page-bg-1');
+      };
+
+      return (
+        <select
+          className="filter-select header-select"
+          value={currentTheme}
+          onChange={(e)=>changeTheme(e.target.value)}
+          title="Välj tema"
+        >
+          <option value="blue">Tema: Blå</option>
+          <option value="green">Tema: Grön</option>
+          <option value="purple">Tema: Lila</option>
+          <option value="red">Tema: Röd</option>
+          <option value="gray">Tema: Grå</option>
+        </select>
+      );
+    }
+
+    /* ===== Dropdown: Layout ===== */
+    function LayoutDropdown({ layout, onChange }){
+      return (
+        <select
+          className="filter-select header-select"
+          value={layout}
+          onChange={(e)=>onChange(e.target.value)}
+          title="Välj layout för inlägg"
+        >
+          <option value="stacked">Layout: Staplad</option>
+          <option value="grid">Layout: Grid</option>
+        </select>
+      );
+    }
+
+    /* ===== HeaderMenu (hamburger) ===== */
+    function HeaderMenu({
+      session,
+      onNewPost,
+      onShowInfo,
+      onShowTrash,
+      onLogout,
+      layoutMode,
+      changeLayout
+    }){
+      const [open, setOpen] = useState(false);
+      const panelRef = useRef(null);
+
+      useEffect(()=>{
+        const onDocClick = (e)=>{
+          if (!open) return;
+          if (panelRef.current && !panelRef.current.contains(e.target)) {
+            setOpen(false);
+          }
+        };
+        document.addEventListener('click', onDocClick);
+        return ()=>document.removeEventListener('click', onDocClick);
+      },[open]);
+
+      return (
+        <div style={{position:'relative'}}>
+          <button
+            className="hamburger-btn"
+            aria-label="Meny"
+            aria-expanded={open}
+            onClick={(e)=>{ e.stopPropagation(); setOpen(v=>!v); }}
+          >
+            <span className="hamburger-icon"><div/></span>
+          </button>
+
+          {open && (
+            <>
+              <div className="menu-overlay"/>
+              <div className="menu-panel" ref={panelRef} onClick={(e)=>e.stopPropagation()}>
+                <div className="menu-section">
+                  <div className="menu-label">Tema & layout</div>
+                  <ThemeDropdown/>
+                  <LayoutDropdown layout={layoutMode} onChange={changeLayout}/>
+                </div>
+
+                <div className="menu-divider"></div>
+
+                <div className="menu-section">
+                  <button className="primary-btn header-cta" onClick={()=>{ setOpen(false); onNewPost(); }}>
+                    <span style={{fontSize:18,lineHeight:1}}>➕</span>
+                    <span>Nytt inlägg</span>
+                  </button>
+                  <div className="menu-row" style={{gap:10}}>
+                    <button className="pill-btn" onClick={()=>{ setOpen(false); onShowTrash(); }} title="Visa papperskorg">🗑️ Papperskorg</button>
+                    <button className="info-btn" onClick={()=>{ setOpen(false); onShowInfo(); }} title="Information">ℹ️</button>
+                  </div>
+                </div>
+
+                <div className="menu-divider"></div>
+
+                <div className="menu-section">
+                  <div className="menu-label">Konto</div>
+                  <div className="user-line" title={session.email}>
+                    <div className="user-avatar">{(session.email||'?')[0].toUpperCase()}</div>
+                    <div className="user-line-name">{fullNameFromEmail(session.email)}</div>
+                  </div>
+                  <button onClick={()=>{ setOpen(false); onLogout(); }} className="pill-btn logout-btn">Logga ut</button>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      );
+    }
+
     /* ===== Huvudvy ===== */
     function MainPage({ session, onLogout }) {
       const [posts,setPosts] = useState([]);
@@ -845,6 +1093,13 @@
       const [categoryFilter,setCategoryFilter] = useState('all');
       const [authorFilter,setAuthorFilter] = useState('');
       const [resultCount,setResultCount] = useState(0);
+
+      /* Layoutläge (stacked/grid) – default grid */
+      const [layoutMode, setLayoutMode] = useState(() => localStorage.getItem('siteLayout') || 'grid');
+      const changeLayout = (mode) => {
+        setLayoutMode(mode);
+        localStorage.setItem('siteLayout', mode);
+      };
 
       const loadPosts = async ()=>{
         setLoading(true);
@@ -924,12 +1179,17 @@
               <img src={CONFIG.LOGO_SRC} alt="Portal" className="logo-img"/>
               <span className="tagline">Plattformen för initiativ</span>
             </a>
-            <div className="user-info">
-              <button className="info-btn" onClick={()=>setShowInfo(true)} title="Information om plattformen">ℹ️</button>
-              <button className="pill-btn" onClick={()=>setShowTrash(true)} title="Visa papperskorg">🗑️ Papperskorg</button>
-              <span className="user-name" title={session.email}>{session.displayName || firstNameFromEmail(session.email)}</span>
-              <button onClick={handleLogout} className="pill-btn logout-btn">Logga ut</button>
-            </div>
+
+            {/* HAMBURGER-MENY */}
+            <HeaderMenu
+              session={session}
+              onNewPost={()=>setShowCreatePost(true)}
+              onShowInfo={()=>setShowInfo(true)}
+              onShowTrash={()=>setShowTrash(true)}
+              onLogout={handleLogout}
+              layoutMode={layoutMode}
+              changeLayout={changeLayout}
+            />
           </header>
 
           <main className="main-container">
@@ -944,18 +1204,12 @@
               <div className="results-count">{loading ? 'Söker…' : `${resultCount} inlägg funna`}</div>
             )}
 
-            {!hasActiveFilters && (
-              <div className="create-post-card" onClick={()=>setShowCreatePost(true)}>
-                <div className="create-post-prompt">💡 Klicka för att skapa ett inlägg – vad har du på gång {session.displayName || firstNameFromEmail(session.email)}?</div>
-              </div>
-            )}
-
             {loading ? (
               <Loader text="Laddar…"/>
             ) : posts.length===0 ? (
               <div className="loader-text">Inga inlägg ännu. Var först ut!</div>
             ) : (
-              <div className="posts-grid">
+              <div className={`posts-grid ${layoutMode === 'grid' ? 'grid' : 'stacked'}`}>
                 {posts.map(post=>{
                   const isAuthor = String(post.author_email||'').toLowerCase() === String(session.email||'').toLowerCase();
                   return (
@@ -1033,6 +1287,9 @@
       const [booting,setBooting] = useState(true);
       
       useEffect(()=>{
+        const savedTheme = localStorage.getItem('siteTheme') || 'blue';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        
         const saved = localStorage.getItem(CONFIG.STORAGE_KEY);
         if (saved) { 
           try { setSession(JSON.parse(saved)); } 
