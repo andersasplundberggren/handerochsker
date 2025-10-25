@@ -18,8 +18,8 @@
 
     :root{
       /* Temastyrd sidbakgrund (mindre mörk + följer temafärgen) */
-      --page-bg-1:#1B2233;   /* topp – standard blå ton */
-      --page-bg-2:#141A28;   /* botten – standard blå ton */
+      --page-bg-1:#1B2233;
+      --page-bg-2:#141A28;
 
       /* Primärfärgs-RGB (för subtila ljusfläckar i bakgrunden) */
       --theme-primary-rgb:88,99,199;
@@ -47,7 +47,6 @@
       --card-accent:rgba(88, 99, 199, 0.03);
     }
 
-    /* Blå färggrupp */
     [data-theme="blue"]{
       --theme-primary:#5863C7;
       --theme-primary-dark:#362E7D;
@@ -55,14 +54,13 @@
       --theme-tint1:#DBDEF4;
       --theme-tint2:#EFF2FF;
       --theme-primary-rgb:88,99,199;
-      --page-bg-1:#1B2233;   /* lite mörk, inte kolsvart */
+      --page-bg-1:#1B2233;
       --page-bg-2:#141A28;
       --bg-primary:#F0F2F5;
       --glass-bg:#FFFFFF;
       --card-accent:rgba(88, 99, 199, 0.03);
     }
 
-    /* Grön färggrupp */
     [data-theme="green"]{
       --theme-primary:#00A78B;
       --theme-primary-dark:#0F6F60;
@@ -70,14 +68,13 @@
       --theme-tint1:#D2EFE7;
       --theme-tint2:#EEFAF7;
       --theme-primary-rgb:0,167,139;
-      --page-bg-1:#152420;   /* grön tonad, lite mörk */
+      --page-bg-1:#152420;
       --page-bg-2:#101C19;
       --bg-primary:#EEFAF7;
       --glass-bg:#FDFFFE;
       --card-accent:rgba(0, 167, 139, 0.03);
     }
 
-    /* Lila färggrupp */
     [data-theme="purple"]{
       --theme-primary:#9D3E9E;
       --theme-primary-dark:#622977;
@@ -85,14 +82,13 @@
       --theme-tint1:#ECD8EB;
       --theme-tint2:#FFF1FE;
       --theme-primary-rgb:157,62,158;
-      --page-bg-1:#23172B;   /* lila tonad */
+      --page-bg-1:#23172B;
       --page-bg-2:#1B1222;
       --bg-primary:#FFF1FE;
       --glass-bg:#FFFEFF;
       --card-accent:rgba(157, 62, 158, 0.03);
     }
 
-    /* Röd färggrupp */
     [data-theme="red"]{
       --theme-primary:#D5422D;
       --theme-primary-dark:#89281F;
@@ -100,14 +96,13 @@
       --theme-tint1:#FCDBDA;
       --theme-tint2:#FEEFEE;
       --theme-primary-rgb:213,66,45;
-      --page-bg-1:#2A1919;   /* röd tonad */
+      --page-bg-1:#2A1919;
       --page-bg-2:#201213;
       --bg-primary:#FEEFEE;
       --glass-bg:#FFFCFC;
       --card-accent:rgba(213, 66, 45, 0.03);
     }
 
-    /* Grå färggrupp */
     [data-theme="gray"]{
       --theme-primary:#48606B;
       --theme-primary-dark:#2A2F31;
@@ -115,27 +110,27 @@
       --theme-tint1:#DBDFE0;
       --theme-tint2:#EFF3F4;
       --theme-primary-rgb:72,96,107;
-      --page-bg-1:#1A2023;   /* neutral grå ton */
+      --page-bg-1:#1A2023;
       --page-bg-2:#14181B;
       --bg-primary:#EFF3F4;
       --glass-bg:#FAFBFB;
       --card-accent:rgba(72, 96, 107, 0.03);
     }
 
-    /* ===== SIDA: mörkare bakgrund som följer temat, korten förblir ljusa ===== */
+    /* SIDA: mörkare bakgrund som följer temat, korten förblir ljusa */
     body{
       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
       background:
         radial-gradient(1100px 520px at 10% -10%, rgba(var(--theme-primary-rgb),0.12), transparent 60%),
         linear-gradient(180deg, var(--page-bg-1), var(--page-bg-2));
       min-height:100vh;
-      color:#E9EEF5;   /* läsbar text mot den mörkare bakgrunden */
+      color:#E9EEF5;
       -webkit-font-smoothing:antialiased;
       overflow-x:hidden;
       transition:background 0.3s ease, color .2s ease;
     }
 
-    /* Alla kort och paneler behåller sin ljusa färgsättning och mörk text */
+    /* Korten/panelerna behåller sin ljusa färgsättning och mörk text */
     .post-card,
     .login-card,
     .search-filters,
@@ -218,7 +213,6 @@
     @media (max-width:1024px){.posts-grid{gap:16px}}
     @media (max-width:640px){.posts-grid{gap:16px}}
 
-    /* Kort */
     .post-card{
       background:linear-gradient(to bottom, var(--glass-bg), var(--glass-bg)), 
                  linear-gradient(135deg, var(--card-accent), transparent);
@@ -246,7 +240,6 @@
     .edit-btn{border:none;color:var(--theme-primary);background:var(--bg-primary);padding:6px 10px;border-radius:4px;font-size:16px;line-height:1}
     .edit-btn:hover{background:#E4E6EB}
 
-    /* Progress */
     .progress-wrap{display:flex;align-items:center;gap:8px;margin:0;padding:8px 16px 12px;border-top:none}
     .progress-chip{font-size:12px;font-weight:600;padding:4px 8px;border-radius:4px;color:#fff;border:none;background:#111827}
     .progress-bar{flex:1;height:10px;background:var(--bg-primary);border-radius:999px;overflow:hidden;position:relative;box-shadow:none}
@@ -301,7 +294,6 @@
     .info-modal-content strong{color:var(--text-primary);font-weight:600}
     .info-highlight{background:#FEF3C7;padding:12px 16px;border-radius:8px;border-left:3px solid #F59E0B;margin:12px 0;font-size:15px}
 
-    /* Temaväljare i header */
     .theme-selector{display:flex;align-items:center;gap:8px}
     .theme-selector-label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-right:4px}
     .theme-buttons{display:flex;gap:6px}
@@ -718,7 +710,6 @@
               <ProgressSelector value={progress} onChange={setProgress} />
             </div>
 
-            <!-- CHANGED: justify-content -> justifyContent (camelCase) -->
             <div style={{display:'flex',justifyContent:'flex-end',gap:12,marginTop:20}}>
               <button type="button" onClick={onClose} className="ghost-btn">Avbryt</button>
               <button type="submit" disabled={loading} className="primary-btn">
@@ -878,13 +869,11 @@
             )}
 
             <form onSubmit={submitComment} style={{display:'flex',gap:8,marginTop:12}}>
-              <!-- CHANGED: transition value must be a string -->
               <input type="text" value={commentText} onChange={(e) => setCommentText(e.target.value)} placeholder="Skriv en kommentar..." disabled={submitting}
                 style={{flex:1,padding:'10px 14px',border:'1px solid rgba(0,0,0,.12)',borderRadius:10,fontSize:14,background:'rgba(255,255,255,.98)',transition:'0.2s'}}
                 onFocus={(e) => { e.target.style.borderColor = '#5863C7'; e.target.style.boxShadow = '0 0 0 3px rgba(88,99,199,.15)'; }}
                 onBlur={(e) => { e.target.style.borderColor = 'rgba(0,0,0,.12)'; e.target.style.boxShadow = 'none'; }}
               />
-              <!-- CHANGED: transition value must be a string -->
               <button type="submit" disabled={!commentText.trim() || submitting}
                 style={{border:'none',padding:'10px 16px',borderRadius:10,background: commentText.trim() && !submitting ? '#5863C7' : '#d1d5db',color:'#fff',fontWeight:800,cursor: commentText.trim() && !submitting ? 'pointer' : 'not-allowed',fontSize:14,transition:'0.2s'}}
               >
