@@ -986,6 +986,49 @@
       );
     }
 
+    /* ===== Temaväljare ===== */
+    function ThemeSelector(){
+      const [currentTheme, setCurrentTheme] = React.useState(() => {
+        return localStorage.getItem('siteTheme') || 'blue';
+      });
+
+      const themes = [
+        {id: 'blue', name: 'Blå'},
+        {id: 'green', name: 'Grön'},
+        {id: 'purple', name: 'Lila'},
+        {id: 'red', name: 'Röd'},
+        {id: 'gray', name: 'Grå'}
+      ];
+
+      React.useEffect(() => {
+        document.documentElement.setAttribute('data-theme', currentTheme);
+      }, [currentTheme]);
+
+      const changeTheme = (themeId) => {
+        setCurrentTheme(themeId);
+        localStorage.setItem('siteTheme', themeId);
+        document.documentElement.setAttribute('data-theme', themeId);
+      };
+
+      return (
+        <div className="theme-selector">
+          <div className="theme-selector-label">Färgtema</div>
+          <div className="theme-buttons">
+            {themes.map(theme => (
+              <button
+                key={theme.id}
+                className={`theme-btn ${currentTheme === theme.id ? 'active' : ''}`}
+                data-theme={theme.id}
+                onClick={() => changeTheme(theme.id)}
+                title={theme.name}
+                aria-label={`Välj ${theme.name} tema`}
+              />
+            ))}
+          </div>
+        </div>
+      );
+    }
+
     /* ===== Huvudvy ===== */
     function MainPage({ session, onLogout }) {
       const [posts,setPosts] = useState([]);
