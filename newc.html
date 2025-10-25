@@ -718,7 +718,8 @@
               <ProgressSelector value={progress} onChange={setProgress} />
             </div>
 
-            <div style={{display:'flex',justify-content:'flex-end',gap:12,marginTop:20}}>
+            <!-- CHANGED: justify-content -> justifyContent (camelCase) -->
+            <div style={{display:'flex',justifyContent:'flex-end',gap:12,marginTop:20}}>
               <button type="button" onClick={onClose} className="ghost-btn">Avbryt</button>
               <button type="submit" disabled={loading} className="primary-btn">
                 {loading ? (isEditing ? 'Sparar…' : 'Publicerar…') : (isEditing ? 'Spara ändringar' : 'Publicera')}
@@ -877,13 +878,15 @@
             )}
 
             <form onSubmit={submitComment} style={{display:'flex',gap:8,marginTop:12}}>
+              <!-- CHANGED: transition value must be a string -->
               <input type="text" value={commentText} onChange={(e) => setCommentText(e.target.value)} placeholder="Skriv en kommentar..." disabled={submitting}
-                style={{flex:1,padding:'10px 14px',border:'1px solid rgba(0,0,0,.12)',borderRadius:10,fontSize:14,background:'rgba(255,255,255,.98)',transition:.2s}}
+                style={{flex:1,padding:'10px 14px',border:'1px solid rgba(0,0,0,.12)',borderRadius:10,fontSize:14,background:'rgba(255,255,255,.98)',transition:'0.2s'}}
                 onFocus={(e) => { e.target.style.borderColor = '#5863C7'; e.target.style.boxShadow = '0 0 0 3px rgba(88,99,199,.15)'; }}
                 onBlur={(e) => { e.target.style.borderColor = 'rgba(0,0,0,.12)'; e.target.style.boxShadow = 'none'; }}
               />
+              <!-- CHANGED: transition value must be a string -->
               <button type="submit" disabled={!commentText.trim() || submitting}
-                style={{border:'none',padding:'10px 16px',borderRadius:10,background: commentText.trim() && !submitting ? '#5863C7' : '#d1d5db',color:'#fff',fontWeight:800,cursor: commentText.trim() && !submitting ? 'pointer' : 'not-allowed',fontSize:14,transition:.2s}}
+                style={{border:'none',padding:'10px 16px',borderRadius:10,background: commentText.trim() && !submitting ? '#5863C7' : '#d1d5db',color:'#fff',fontWeight:800,cursor: commentText.trim() && !submitting ? 'pointer' : 'not-allowed',fontSize:14,transition:'0.2s'}}
               >
                 {submitting ? 'Skickar...' : 'Skicka'}
               </button>
