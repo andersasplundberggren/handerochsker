@@ -1007,46 +1007,42 @@
     /* ===== Temaväljare ===== */
     function ThemeSelector(){
       const [currentTheme, setCurrentTheme] = useState(() => {
-        return localStorage.getItem('siteTheme') || 'blue';
+        const saved = localStorage.getItem('siteTheme') || 'blue';
+        // Set it immediately on mount
+        document.documentElement.setAttribute('data-theme', saved);
+        return saved;
       });
 
       const themes = [
-        {id: 'blue', name: 'Blå'},
-        {id: 'green', name: 'Grön'},
-        {id: 'purple', name: 'Lila'},
-        {id: 'red', name: 'Röd'},
-        {id: 'gray', name: 'Grå'}
+        {id: 'blue', name: 'Blå', color: '#5863C7'},
+        {id: 'green', name: 'Grön', color: '#00A78B'},
+        {id: 'purple', name: 'Lila', color: '#9D3E9E'},
+        {id: 'red', name: 'Röd', color: '#D5422D'},
+        {id: 'gray', name: 'Grå', color: '#48606B'}
       ];
 
-      useEffect(() => {
-        document.documentElement.setAttribute('data-theme', currentTheme);
-        // Force a reflow to ensure CSS updates
-        document.body.offsetHeight;
-      }, [currentTheme]);
-
       const changeTheme = (themeId) => {
+        // Update state
         setCurrentTheme(themeId);
+        // Save to localStorage
         localStorage.setItem('siteTheme', themeId);
-        // Immediately set the attribute
+        // Set attribute directly - this is what works in the test
         document.documentElement.setAttribute('data-theme', themeId);
+        // Force browser to recognize the change
+        window.getComputedStyle(document.documentElement).getPropertyValue('--bg-primary');
       };
 
       return (
         <div className="theme-selector">
-          <div className="theme-selector-label">Färgtema</div>
+          <div className="theme-selector-label">Tema</div>
           <div className="theme-buttons">
             {themes.map(theme => (
               <button
                 key={theme.id}
                 className={`theme-btn ${currentTheme === theme.id ? 'active' : ''}`}
-                data-theme={theme.id}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  changeTheme(theme.id);
-                }}
+                style={{background: theme.color}}
+                onClick={() => changeTheme(theme.id)}
                 title={theme.name}
-                aria-label={`Välj ${theme.name} tema`}
                 type="button"
               />
             ))}
