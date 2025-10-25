@@ -988,7 +988,7 @@
 
     /* ===== Temaväljare ===== */
     function ThemeSelector(){
-      const [currentTheme, setCurrentTheme] = React.useState(() => {
+      const [currentTheme, setCurrentTheme] = useState(() => {
         return localStorage.getItem('siteTheme') || 'blue';
       });
 
@@ -1000,7 +1000,7 @@
         {id: 'gray', name: 'Grå'}
       ];
 
-      React.useEffect(() => {
+      useEffect(() => {
         document.documentElement.setAttribute('data-theme', currentTheme);
       }, [currentTheme]);
 
@@ -1233,47 +1233,6 @@
     }
 
     /* ===== Temaväljare ===== */
-    function ThemeSelector(){
-      const [currentTheme, setCurrentTheme] = useState(() => {
-        return localStorage.getItem('siteTheme') || 'blue';
-      });
-
-      const themes = [
-        {id: 'blue', name: 'Blå', color: '#5863C7'},
-        {id: 'green', name: 'Grön', color: '#00A78B'},
-        {id: 'purple', name: 'Lila', color: '#9D3E9E'},
-        {id: 'red', name: 'Röd', color: '#D5422D'},
-        {id: 'gray', name: 'Grå', color: '#48606B'}
-      ];
-
-      useEffect(() => {
-        document.documentElement.setAttribute('data-theme', currentTheme);
-      }, [currentTheme]);
-
-      const changeTheme = (themeId) => {
-        setCurrentTheme(themeId);
-        localStorage.setItem('siteTheme', themeId);
-      };
-
-      return (
-        <div className="theme-selector">
-          <div className="theme-selector-label">Färgtema</div>
-          <div className="theme-buttons">
-            {themes.map(theme => (
-              <button
-                key={theme.id}
-                className={`theme-btn ${currentTheme === theme.id ? 'active' : ''}`}
-                data-theme={theme.id}
-                onClick={() => changeTheme(theme.id)}
-                title={theme.name}
-                aria-label={`Välj ${theme.name} tema`}
-              />
-            ))}
-          </div>
-        </div>
-      );
-    }
-
     /* ===== App ===== */
     function App(){
       const [session,setSession] = useState(null);
