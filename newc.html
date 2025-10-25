@@ -14,11 +14,13 @@
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
     
-    html {
-      transition: background-color 0.3s ease;
-    }
+    html { transition: background-color 0.3s ease; }
 
     :root{
+      /* Ny: separat sidbakgrund (mörk) så kort/komponenter kan behålla ljusa tokens */
+      --page-bg:#0B1220;
+
+      /* Befintliga tokens (lämnas ljusa för att kort och UI behåller färgsättning) */
       --bg-primary:#F0F2F5;
       --glass-bg:#FFFFFF;
       --glass-border:#E4E6EB;
@@ -31,7 +33,7 @@
       --progress-planeras:#F59E0B;
       --progress-pilot:#3B82F6;
       --progress-driftsatt:#10B981;
-      
+
       /* Tema färger - Standard (Blå) */
       --theme-primary:#5863C7;
       --theme-primary-dark:#362E7D;
@@ -43,18 +45,20 @@
 
     /* Blå färggrupp (explicit) */
     [data-theme="blue"]{
+      --page-bg:#0B1220;             /* mörk bakgrund */
       --theme-primary:#5863C7;
       --theme-primary-dark:#362E7D;
       --theme-primary-light:#91A9FF;
       --theme-tint1:#DBDEF4;
       --theme-tint2:#EFF2FF;
-      --bg-primary:#F0F2F5;
+      --bg-primary:#F0F2F5;          /* lämnas ljus för kort/knappar som använder denna */
       --glass-bg:#FFFFFF;
       --card-accent:rgba(88, 99, 199, 0.03);
     }
 
     /* Grön färggrupp */
     [data-theme="green"]{
+      --page-bg:#0E1917;
       --theme-primary:#00A78B;
       --theme-primary-dark:#0F6F60;
       --theme-primary-light:#7AF3D7;
@@ -67,6 +71,7 @@
 
     /* Lila färggrupp */
     [data-theme="purple"]{
+      --page-bg:#140C18;
       --theme-primary:#9D3E9E;
       --theme-primary-dark:#622977;
       --theme-primary-light:#F5A7E8;
@@ -79,6 +84,7 @@
 
     /* Röd färggrupp */
     [data-theme="red"]{
+      --page-bg:#1A0E0E;
       --theme-primary:#D5422D;
       --theme-primary-dark:#89281F;
       --theme-primary-light:#FFA69B;
@@ -91,6 +97,7 @@
 
     /* Grå färggrupp */
     [data-theme="gray"]{
+      --page-bg:#121517;
       --theme-primary:#48606B;
       --theme-primary-dark:#2A2F31;
       --theme-primary-light:#88A8B5;
@@ -104,13 +111,22 @@
     /* ===== Facebook-style bakgrund ===== */
     body{
       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-      background:var(--bg-primary);
+      background:var(--page-bg);               /* mörkare sida */
       min-height:100vh;
-      color:var(--text-primary);
+      color:#E5E7EB;                           /* ljus texts färg på sidan */
       -webkit-font-smoothing:antialiased;
       overflow-x:hidden;
-      transition:background-color 0.3s ease;
+      transition:background-color 0.3s ease, color .2s ease;
     }
+
+    /* Säkra att korten behåller mörk text på ljusa bakgrunder */
+    .post-card,
+    .login-card,
+    .search-filters,
+    .create-post-card,
+    .trash-item,
+    .modal-content,
+    .results-count { color: var(--text-primary); }
 
     /* ===== Facebook-style Header ===== */
     .glass-header{
@@ -129,7 +145,7 @@
     .pill-btn{background:var(--bg-primary);color:var(--text-primary);border:none;padding:8px 12px;border-radius:6px;font-size:15px;font-weight:600;cursor:pointer;transition:.2s}
     .pill-btn:hover{background:#E4E6EB}
     .logout-btn:hover{color:var(--danger);background:rgba(220,38,38,.1)}
-    .info-btn{background:var(--bg-primary);border:none;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:16px;transition:.2s}
+    .info-btn{background:var(--bg-primary);border:none;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:16px;transition:.2s;color:var(--text-primary)}
     .info-btn:hover{background:#E4E6EB}
 
     .login-container{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px;position:relative;z-index:1}
@@ -146,7 +162,7 @@
       width:100%;padding:12px 16px;border:1px solid var(--glass-border);border-radius:6px;font-size:15px;background:var(--glass-bg);transition:.2s;font-family:inherit
     }
     textarea.form-input{min-height:120px}
-    .form-input:focus,.search-input:focus,.filter-select:focus{outline:none;border-color:var(--theme-primary);background:var(--glass-bg);box-shadow:0 0 0 2px rgba(var(--theme-primary-rgb),.1)}
+    .form-input:focus,.search-input:focus,.filter-select:focus{outline:none;border-color:var(--theme-primary);background:var(--glass-bg);box-shadow:0 0 0 2px rgba(88,99,199,.1)}
     .form-input.otp-input{text-align:center;font-size:24px;letter-spacing:8px;font-weight:600}
     .primary-btn{background:var(--theme-primary);color:#fff;border:none;padding:12px 18px;border-radius:6px;font-size:15px;font-weight:600;cursor:pointer;transition:.2s;box-shadow:none}
     .primary-btn:hover{background:var(--theme-primary-dark);transform:none}
@@ -159,18 +175,14 @@
     .loader{display:flex;flex-direction:column;align-items:center;gap:12px;padding:40px}
     .spinner{width:32px;height:32px;border-radius:50%;border:3px solid var(--glass-border);border-top-color:var(--theme-primary);animation:spin .8s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
-    .loader-text{color:var(--text-secondary);font-size:15px;text-align:center;background:var(--glass-bg);border:1px solid var(--glass-border);padding:8px 12px;border-radius:6px}
+    .loader-text{color:#CBD5E1;font-size:15px;text-align:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);padding:8px 12px;border-radius:6px}
 
     .main-container{max-width:680px;margin:0 auto;padding:16px 16px 80px;position:relative;z-index:1}
     .search-filters{
       background:linear-gradient(to bottom, var(--glass-bg), var(--glass-bg)), 
-                   linear-gradient(135deg, var(--card-accent), transparent);
-      background-blend-mode:normal;
-      border:1px solid var(--glass-border);
-      border-radius:8px;
-      padding:16px;
-      box-shadow:var(--shadow-sm);
-      margin-bottom:16px;
+                 linear-gradient(135deg, var(--card-accent), transparent);
+      background-blend-mode:normal;border:1px solid var(--glass-border);
+      border-radius:8px;padding:16px;box-shadow:var(--shadow-sm);margin-bottom:16px
     }
     .search-row{display:grid;grid-template-columns:1fr 220px 220px auto;gap:12px;align-items:end}
     .clear-btn{background:var(--theme-primary);color:#fff;border:none;padding:12px 16px;border-radius:6px;font-size:15px;font-weight:600;cursor:pointer;transition:.2s}
@@ -179,15 +191,9 @@
 
     .create-post-card{
       background:linear-gradient(to bottom, var(--glass-bg), var(--glass-bg)), 
-                   linear-gradient(135deg, var(--card-accent), transparent);
-      background-blend-mode:normal;
-      border:1px solid var(--glass-border);
-      border-radius:8px;
-      padding:16px;
-      box-shadow:var(--shadow-sm);
-      margin:0 0 16px;
-      cursor:pointer;
-      transition:.2s;
+                 linear-gradient(135deg, var(--card-accent), transparent);
+      background-blend-mode:normal;border:1px solid var(--glass-border);
+      border-radius:8px;padding:16px;box-shadow:var(--shadow-sm);margin:0 0 16px;cursor:pointer;transition:.2s
     }
     .create-post-card:hover{box-shadow:var(--shadow-md)}
     .create-post-prompt{color:var(--text-secondary);font-size:15px;text-align:left;background:var(--bg-primary);padding:10px 16px;border-radius:50px}
@@ -200,15 +206,9 @@
     .post-card{
       background:linear-gradient(to bottom, var(--glass-bg), var(--glass-bg)), 
                  linear-gradient(135deg, var(--card-accent), transparent);
-      background-blend-mode:normal;
-      border:1px solid var(--glass-border);
-      border-radius:8px;
-      padding:0;
-      box-shadow:var(--shadow-sm);
-      display:flex;
-      flex-direction:column;
-      min-height:auto;
-      transition:.2s;
+      background-blend-mode:normal;border:1px solid var(--glass-border);
+      border-radius:8px;padding:0;box-shadow:var(--shadow-sm);
+      display:flex;flex-direction:column;min-height:auto;transition:.2s
     }
     .post-card:hover{box-shadow:var(--shadow-md);transform:none}
     .post-header{display:flex;gap:12px;align-items:center;margin-bottom:0;padding:12px 16px}
@@ -230,9 +230,9 @@
     .edit-btn{border:none;color:var(--theme-primary);background:var(--bg-primary);padding:6px 10px;border-radius:4px;font-size:16px;line-height:1}
     .edit-btn:hover{background:#E4E6EB}
 
-    /* Progress: tydligare */
+    /* Progress */
     .progress-wrap{display:flex;align-items:center;gap:8px;margin:0;padding:8px 16px 12px;border-top:none}
-    .progress-chip{font-size:12px;font-weight:600;padding:4px 8px;border-radius:4px;color:#fff;border:none}
+    .progress-chip{font-size:12px;font-weight:600;padding:4px 8px;border-radius:4px;color:#fff;border:none;background:#111827}
     .progress-bar{flex:1;height:10px;background:var(--bg-primary);border-radius:999px;overflow:hidden;position:relative;box-shadow:none}
     .progress-stages{display:flex;height:100%}
     .progress-stage{flex:1;opacity:.3;transition:.2s}
@@ -275,10 +275,9 @@
     .progress-option.pilot{color:var(--progress-pilot)}
     .progress-option.driftsatt{color:var(--progress-driftsatt)}
 
-    .info-banner{background:#FEF3C7;border:1px solid #F59E0B;border-radius:8px;padding:16px;margin-bottom:16px}
+    .info-banner{background:#FEF3C7;border:1px solid #F59E0B;border-radius:8px;padding:16px;margin-bottom:16px;color:#78350F}
     .info-banner-title{display:flex;align-items:center;gap:8px;font-size:17px;font-weight:600;color:#92400E;margin-bottom:8px}
-    .info-banner-text{font-size:15px;line-height:1.6;color:#78350F;margin-bottom:6px}
-    .info-banner-text strong{font-weight:600;color:#92400E}
+    .info-banner-text{font-size:15px;line-height:1.6;margin-bottom:6px}
     .info-btn{position:relative;background:var(--bg-primary);border:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;cursor:pointer;transition:0.2s;font-size:16px;font-weight:600;color:var(--text-primary)}
     .info-btn:hover{background:#E4E6EB}
     .info-modal-content{line-height:1.6;color:var(--text-primary);font-size:15px}
@@ -287,44 +286,12 @@
     .info-highlight{background:#FEF3C7;padding:12px 16px;border-radius:8px;border-left:3px solid #F59E0B;margin:12px 0;font-size:15px}
 
     /* Temaväljare i header */
-    .theme-selector{
-      display:flex;
-      align-items:center;
-      gap:8px;
-    }
-
-    .theme-selector-label{
-      font-size:13px;
-      font-weight:600;
-      color:var(--text-secondary);
-      margin-right:4px;
-    }
-
-    .theme-buttons{
-      display:flex;
-      gap:6px;
-    }
-
-    .theme-btn{
-      width:32px;
-      height:32px;
-      border-radius:50%;
-      border:2px solid transparent;
-      cursor:pointer;
-      transition:.2s;
-      position:relative;
-    }
-
-    .theme-btn:hover{
-      transform:scale(1.1);
-      box-shadow:0 2px 8px rgba(0,0,0,.15);
-    }
-
-    .theme-btn.active{
-      border-color:var(--text-primary);
-      transform:scale(1.05);
-    }
-
+    .theme-selector{display:flex;align-items:center;gap:8px}
+    .theme-selector-label{font-size:13px;font-weight:600;color:var(--text-secondary);margin-right:4px}
+    .theme-buttons{display:flex;gap:6px}
+    .theme-btn{width:32px;height:32px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:.2s;position:relative}
+    .theme-btn:hover{transform:scale(1.1);box-shadow:0 2px 8px rgba(0,0,0,.15)}
+    .theme-btn.active{border-color:var(--text-primary);transform:scale(1.05)}
     .theme-btn[data-theme="blue"]{background:#5863C7}
     .theme-btn[data-theme="green"]{background:#00A78B}
     .theme-btn[data-theme="purple"]{background:#9D3E9E}
@@ -332,16 +299,9 @@
     .theme-btn[data-theme="gray"]{background:#48606B}
 
     @media (max-width:768px){
-      .theme-selector-label{
-        display:none;
-      }
-      .theme-buttons{
-        gap:4px;
-      }
-      .theme-btn{
-        width:28px;
-        height:28px;
-      }
+      .theme-selector-label{display:none}
+      .theme-buttons{gap:4px}
+      .theme-btn{width:28px;height:28px}
     }
   </style>
 </head>
@@ -353,19 +313,13 @@
 
     /* =======================
        KONFIG (BYT HÄR VID FLYTT)
-       =======================
-       TODO: 1) API_URL – byt till din nya Apps Script Web App URL
-             2) ALLOWED_EMAIL_DOMAIN – byt om du vill tillåta annan domän
-             3) STORAGE_KEY – om du vill separera sessioner mellan miljöer
-             4) LOGO_SRC – byt bildsökväg om logotypen ligger annorlunda
-    */
-   const CONFIG = {
-  API_URL: 'https://script.google.com/macros/s/AKfycbw7OvdjygHoFhu_Z1HAapi0bt7Ra7KbaoWDPfDgD1Cy-82IxJQ0s-t4lji9bPdCdvI/exec',
-  ALLOWED_EMAIL_DOMAIN: 'karlskoga.se',
-  STORAGE_KEY: 'karlskoga_session',
-  LOGO_SRC: './hander_och_sker.png'
-};
-
+       ======================= */
+    const CONFIG = {
+      API_URL: 'https://script.google.com/macros/s/AKfycbw7OvdjygHoFhu_Z1HAapi0bt7Ra7KbaoWDPfDgD1Cy-82IxJQ0s-t4lji9bPdCdvI/exec',
+      ALLOWED_EMAIL_DOMAIN: 'karlskoga.se',
+      STORAGE_KEY: 'karlskoga_session',
+      LOGO_SRC: './hander_och_sker.png'
+    };
 
     /* Progress-steg (håll i sync med backend) */
     const PROGRESS_STAGES = {
@@ -417,7 +371,6 @@
     const isAllowedEmail = (email) => {
       if (!email) return false;
       const e = String(email).trim().toLowerCase();
-      // TODO: vill du ta bort punkt-kravet? Byt till: return e.endsWith('@' + CONFIG.ALLOWED_EMAIL_DOMAIN);
       return e.endsWith('@' + CONFIG.ALLOWED_EMAIL_DOMAIN) && e.split('@')[0].includes('.');
     };
     const firstNameFromEmail = (email) => {
@@ -428,7 +381,7 @@
     };
     const clamp = (s='', n=140) => s.length <= n ? s : s.slice(0, n-1) + '…';
 
-    /* ===== Progress Bar (tydligare) ===== */
+    /* ===== Progress Bar ===== */
     function ProgressBar({ progress }) {
       const stages = ['planeras', 'pilot', 'driftsatt'];
       const currentIndex = Math.max(0, stages.indexOf(progress || 'planeras'));
@@ -760,7 +713,7 @@
       );
     }
 
-    /* ===== Reaktioner (fixad: user_email) ===== */
+    /* ===== Reaktioner ===== */
     function ReactionBar({ post, session, onUpdate }) {
       const [count,setCount] = useState(0);
       const [hasLiked,setHasLiked] = useState(false);
@@ -770,7 +723,6 @@
         const res = await api.get('post/reactions',{ postId: post.post_id, session: session.sessionToken });
         if (res.success) {
           setCount((res.counts && res.counts.like) || 0);
-          // FIX: backend returnerar user_email (inte userEmail)
           setHasLiked((res.reactions||[]).some(r => String(r.user_email).toLowerCase()===String(session.email).toLowerCase() && r.type==='like'));
         }
       },[post.post_id,session.email,session.sessionToken]);
@@ -911,11 +863,11 @@
             <form onSubmit={submitComment} style={{display:'flex',gap:8,marginTop:12}}>
               <input type="text" value={commentText} onChange={(e) => setCommentText(e.target.value)} placeholder="Skriv en kommentar..." disabled={submitting}
                 style={{flex:1,padding:'10px 14px',border:'1px solid rgba(0,0,0,.12)',borderRadius:10,fontSize:14,background:'rgba(255,255,255,.98)',transition:'.2s'}}
-                onFocus={(e) => { e.target.style.borderColor = 'var(--accent-blue)'; e.target.style.boxShadow = '0 0 0 3px rgba(88,99,199,.15)'; }}
+                onFocus={(e) => { e.target.style.borderColor = '#5863C7'; e.target.style.boxShadow = '0 0 0 3px rgba(88,99,199,.15)'; }}
                 onBlur={(e) => { e.target.style.borderColor = 'rgba(0,0,0,.12)'; e.target.style.boxShadow = 'none'; }}
               />
               <button type="submit" disabled={!commentText.trim() || submitting}
-                style={{border:'none',padding:'10px 16px',borderRadius:10,background: commentText.trim() && !submitting ? 'var(--accent-blue)' : '#d1d5db',color:'#fff',fontWeight:800,cursor: commentText.trim() && !submitting ? 'pointer' : 'not-allowed',fontSize:14,transition:'.2s'}}
+                style={{border:'none',padding:'10px 16px',borderRadius:10,background: commentText.trim() && !submitting ? '#5863C7' : '#d1d5db',color:'#fff',fontWeight:800,cursor: commentText.trim() && !submitting ? 'pointer' : 'not-allowed',fontSize:14,transition:'.2s'}}
               >
                 {submitting ? 'Skickar...' : 'Skicka'}
               </button>
@@ -984,7 +936,6 @@
     function ThemeSelector(){
       const [currentTheme, setCurrentTheme] = useState(() => {
         const saved = localStorage.getItem('siteTheme') || 'blue';
-        // Set it immediately on mount
         document.documentElement.setAttribute('data-theme', saved);
         return saved;
       });
@@ -998,14 +949,10 @@
       ];
 
       const changeTheme = (themeId) => {
-        // Update state
         setCurrentTheme(themeId);
-        // Save to localStorage
         localStorage.setItem('siteTheme', themeId);
-        // Set attribute directly - this is what works in the test
         document.documentElement.setAttribute('data-theme', themeId);
-        // Force browser to recognize the change
-        window.getComputedStyle(document.documentElement).getPropertyValue('--bg-primary');
+        window.getComputedStyle(document.documentElement).getPropertyValue('--page-bg');
       };
 
       return (
@@ -1230,14 +1177,12 @@
       );
     }
 
-    /* ===== Temaväljare ===== */
     /* ===== App ===== */
     function App(){
       const [session,setSession] = useState(null);
       const [booting,setBooting] = useState(true);
       
       useEffect(()=>{
-        // Set initial theme
         const savedTheme = localStorage.getItem('siteTheme') || 'blue';
         document.documentElement.setAttribute('data-theme', savedTheme);
         
