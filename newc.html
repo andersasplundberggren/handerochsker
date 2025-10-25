@@ -43,6 +43,9 @@
       --theme-primary-light:#7AF3D7;
       --theme-tint1:#D2EFE7;
       --theme-tint2:#EEFAF7;
+      --bg-primary:#EEFAF7;
+      --glass-bg:#FDFFFE;
+      --card-accent:rgba(0, 167, 139, 0.03);
     }
 
     /* Lila färggrupp */
@@ -52,6 +55,9 @@
       --theme-primary-light:#F5A7E8;
       --theme-tint1:#ECD8EB;
       --theme-tint2:#FFF1FE;
+      --bg-primary:#FFF1FE;
+      --glass-bg:#FFFEFF;
+      --card-accent:rgba(157, 62, 158, 0.03);
     }
 
     /* Röd färggrupp */
@@ -61,6 +67,9 @@
       --theme-primary-light:#FFA69B;
       --theme-tint1:#FCDBDA;
       --theme-tint2:#FEEFEE;
+      --bg-primary:#FEEFEE;
+      --glass-bg:#FFFCFC;
+      --card-accent:rgba(213, 66, 45, 0.03);
     }
 
     /* Grå färggrupp */
@@ -70,6 +79,33 @@
       --theme-primary-light:#88A8B5;
       --theme-tint1:#DBDFE0;
       --theme-tint2:#EFF3F4;
+      --bg-primary:#EFF3F4;
+      --glass-bg:#FAFBFB;
+      --card-accent:rgba(72, 96, 107, 0.03);
+    }
+
+    /* Blå färggrupp (standard) */
+    :root{
+      --bg-primary:#F0F2F5;
+      --glass-bg:#FFFFFF;
+      --glass-border:#E4E6EB;
+      --text-primary:#050505;
+      --text-secondary:#65676B;
+      --danger:#DC2626;
+      --shadow-sm:0 1px 2px rgba(0,0,0,.1);
+      --shadow-md:0 2px 4px rgba(0,0,0,.1);
+      --shadow-lg:0 8px 16px rgba(0,0,0,.15);
+      --progress-planeras:#F59E0B;
+      --progress-pilot:#3B82F6;
+      --progress-driftsatt:#10B981;
+      
+      /* Tema färger - Standard (Blå) */
+      --theme-primary:#5863C7;
+      --theme-primary-dark:#362E7D;
+      --theme-primary-light:#91A9FF;
+      --theme-tint1:#DBDEF4;
+      --theme-tint2:#EFF2FF;
+      --card-accent:rgba(88, 99, 199, 0.03);
     }
 
     /* ===== Facebook-style bakgrund ===== */
@@ -132,13 +168,33 @@
     .loader-text{color:var(--text-secondary);font-size:15px;text-align:center;background:var(--glass-bg);border:1px solid var(--glass-border);padding:8px 12px;border-radius:6px}
 
     .main-container{max-width:680px;margin:0 auto;padding:16px 16px 80px;position:relative;z-index:1}
-    .search-filters{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:8px;padding:16px;box-shadow:var(--shadow-sm);margin-bottom:16px}
+    .search-filters{
+      background:linear-gradient(to bottom, var(--glass-bg), var(--glass-bg)), 
+                   linear-gradient(135deg, var(--card-accent), transparent);
+      background-blend-mode:normal;
+      border:1px solid var(--glass-border);
+      border-radius:8px;
+      padding:16px;
+      box-shadow:var(--shadow-sm);
+      margin-bottom:16px;
+    }
     .search-row{display:grid;grid-template-columns:1fr 220px 220px auto;gap:12px;align-items:end}
     .clear-btn{background:var(--theme-primary);color:#fff;border:none;padding:12px 16px;border-radius:6px;font-size:15px;font-weight:600;cursor:pointer;transition:.2s}
     .clear-btn:hover{background:var(--theme-primary-dark)}
     .results-count{text-align:center;color:var(--text-secondary);font-size:15px;margin:16px 0;background:var(--glass-bg);border:1px solid var(--glass-border);display:inline-block;padding:12px 16px;border-radius:8px;width:100%}
 
-    .create-post-card{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:8px;padding:16px;box-shadow:var(--shadow-sm);margin:0 0 16px;cursor:pointer;transition:.2s}
+    .create-post-card{
+      background:linear-gradient(to bottom, var(--glass-bg), var(--glass-bg)), 
+                   linear-gradient(135deg, var(--card-accent), transparent);
+      background-blend-mode:normal;
+      border:1px solid var(--glass-border);
+      border-radius:8px;
+      padding:16px;
+      box-shadow:var(--shadow-sm);
+      margin:0 0 16px;
+      cursor:pointer;
+      transition:.2s;
+    }
     .create-post-card:hover{box-shadow:var(--shadow-md)}
     .create-post-prompt{color:var(--text-secondary);font-size:15px;text-align:left;background:var(--bg-primary);padding:10px 16px;border-radius:50px}
 
@@ -147,7 +203,19 @@
     @media (max-width:640px){.posts-grid{gap:16px}}
 
     /* Kort: Facebook-stil */
-    .post-card{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:8px;padding:0;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;min-height:auto;transition:.2s}
+    .post-card{
+      background:linear-gradient(to bottom, var(--glass-bg), var(--glass-bg)), 
+                 linear-gradient(135deg, var(--card-accent), transparent);
+      background-blend-mode:normal;
+      border:1px solid var(--glass-border);
+      border-radius:8px;
+      padding:0;
+      box-shadow:var(--shadow-sm);
+      display:flex;
+      flex-direction:column;
+      min-height:auto;
+      transition:.2s;
+    }
     .post-card:hover{box-shadow:var(--shadow-md);transform:none}
     .post-header{display:flex;gap:12px;align-items:center;margin-bottom:0;padding:12px 16px}
     .post-avatar{width:40px;height:40px;border-radius:50%;background:var(--theme-primary);color:#fff;display:grid;place-items:center;font-weight:600;font-size:16px}
@@ -224,40 +292,30 @@
     .info-modal-content strong{color:var(--text-primary);font-weight:600}
     .info-highlight{background:#FEF3C7;padding:12px 16px;border-radius:8px;border-left:3px solid #F59E0B;margin:12px 0;font-size:15px}
 
-    /* Temaväljare */
+    /* Temaväljare i header */
     .theme-selector{
-      position:fixed;
-      bottom:24px;
-      right:24px;
-      background:var(--glass-bg);
-      border:1px solid var(--glass-border);
-      border-radius:12px;
-      padding:12px;
-      box-shadow:var(--shadow-lg);
-      z-index:1000;
       display:flex;
-      gap:8px;
-      flex-direction:column;
       align-items:center;
+      gap:8px;
     }
 
     .theme-selector-label{
-      font-size:12px;
+      font-size:13px;
       font-weight:600;
       color:var(--text-secondary);
-      margin-bottom:4px;
+      margin-right:4px;
     }
 
     .theme-buttons{
       display:flex;
-      gap:8px;
+      gap:6px;
     }
 
     .theme-btn{
-      width:40px;
-      height:40px;
+      width:32px;
+      height:32px;
       border-radius:50%;
-      border:3px solid transparent;
+      border:2px solid transparent;
       cursor:pointer;
       transition:.2s;
       position:relative;
@@ -265,12 +323,12 @@
 
     .theme-btn:hover{
       transform:scale(1.1);
-      box-shadow:0 4px 12px rgba(0,0,0,.15);
+      box-shadow:0 2px 8px rgba(0,0,0,.15);
     }
 
     .theme-btn.active{
       border-color:var(--text-primary);
-      box-shadow:0 0 0 2px var(--glass-bg);
+      transform:scale(1.05);
     }
 
     .theme-btn[data-theme="blue"]{background:#5863C7}
@@ -280,17 +338,15 @@
     .theme-btn[data-theme="gray"]{background:#48606B}
 
     @media (max-width:768px){
-      .theme-selector{
-        bottom:16px;
-        right:16px;
-        padding:8px;
+      .theme-selector-label{
+        display:none;
       }
       .theme-buttons{
-        gap:6px;
+        gap:4px;
       }
       .theme-btn{
-        width:36px;
-        height:36px;
+        width:28px;
+        height:28px;
       }
     }
   </style>
@@ -1030,6 +1086,7 @@
               <span className="tagline">Plattformen för initiativ</span>
             </a>
             <div className="user-info">
+              <ThemeSelector />
               <button className="info-btn" onClick={()=>setShowInfo(true)} title="Information om plattformen">ℹ️</button>
               <button className="pill-btn" onClick={()=>setShowTrash(true)} title="Visa papperskorg">🗑️ Papperskorg</button>
               <span className="user-name" title={session.email}>{session.displayName || firstNameFromEmail(session.email)}</span>
@@ -1204,12 +1261,7 @@
       
       if (booting) return <Loader text="Startar…"/>;
       if (!session) return <LoginPage onLogin={onLogin}/>;
-      return (
-        <>
-          <MainPage session={session} onLogout={onLogout}/>
-          <ThemeSelector />
-        </>
-      );
+      return <MainPage session={session} onLogout={onLogout}/>;
     }
 
     const root = ReactDOM.createRoot(document.getElementById('root'));
