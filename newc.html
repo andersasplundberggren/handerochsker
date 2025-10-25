@@ -13,6 +13,10 @@
 
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
+    
+    html {
+      transition: background-color 0.3s ease;
+    }
 
     :root{
       --bg-primary:#F0F2F5;
@@ -34,6 +38,19 @@
       --theme-primary-light:#91A9FF;
       --theme-tint1:#DBDEF4;
       --theme-tint2:#EFF2FF;
+      --card-accent:rgba(88, 99, 199, 0.03);
+    }
+
+    /* Blå färggrupp (explicit) */
+    [data-theme="blue"]{
+      --theme-primary:#5863C7;
+      --theme-primary-dark:#362E7D;
+      --theme-primary-light:#91A9FF;
+      --theme-tint1:#DBDEF4;
+      --theme-tint2:#EFF2FF;
+      --bg-primary:#F0F2F5;
+      --glass-bg:#FFFFFF;
+      --card-accent:rgba(88, 99, 199, 0.03);
     }
 
     /* Grön färggrupp */
@@ -115,7 +132,8 @@
       min-height:100vh;
       color:var(--text-primary);
       -webkit-font-smoothing:antialiased;
-      overflow-x:hidden
+      overflow-x:hidden;
+      transition:background-color 0.3s ease;
     }
 
     /* ===== Facebook-style Header ===== */
@@ -988,11 +1006,8 @@
 
     /* ===== Temaväljare ===== */
     function ThemeSelector(){
-      console.log('ThemeSelector rendered');
       const [currentTheme, setCurrentTheme] = useState(() => {
-        const saved = localStorage.getItem('siteTheme') || 'blue';
-        console.log('Initial theme:', saved);
-        return saved;
+        return localStorage.getItem('siteTheme') || 'blue';
       });
 
       const themes = [
@@ -1004,15 +1019,12 @@
       ];
 
       useEffect(() => {
-        console.log('Setting data-theme to:', currentTheme);
         document.documentElement.setAttribute('data-theme', currentTheme);
       }, [currentTheme]);
 
       const changeTheme = (themeId) => {
-        console.log('changeTheme called with:', themeId);
         setCurrentTheme(themeId);
         localStorage.setItem('siteTheme', themeId);
-        document.documentElement.setAttribute('data-theme', themeId);
       };
 
       return (
@@ -1024,10 +1036,7 @@
                 key={theme.id}
                 className={`theme-btn ${currentTheme === theme.id ? 'active' : ''}`}
                 data-theme={theme.id}
-                onClick={() => {
-                  console.log('Button clicked:', theme.id);
-                  changeTheme(theme.id);
-                }}
+                onClick={() => changeTheme(theme.id)}
                 title={theme.name}
                 aria-label={`Välj ${theme.name} tema`}
               />
