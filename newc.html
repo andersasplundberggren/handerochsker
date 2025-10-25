@@ -17,14 +17,14 @@
     html { transition: background-color 0.3s ease; }
 
     :root{
-      /* Temastyrd sidbakgrund (mindre mörk + följer temafärgen) */
-      --page-bg-1:#1B2233;
-      --page-bg-2:#141A28;
+      /* LITE LJUSARE STANDARDBAKGRUND */
+      --page-bg-1:#20273a;
+      --page-bg-2:#181f2c;
 
-      /* Primärfärgs-RGB (för subtila ljusfläckar i bakgrunden) */
+      /* Primärfärgs-RGB för skimmer */
       --theme-primary-rgb:88,99,199;
 
-      /* Ljusa tokens (korten/komponenterna behåller dessa) */
+      /* Ljusa tokens (korten behåller dessa) */
       --bg-primary:#F0F2F5;
       --glass-bg:#FFFFFF;
       --glass-border:#E4E6EB;
@@ -47,6 +47,7 @@
       --card-accent:rgba(88, 99, 199, 0.03);
     }
 
+    /* Blå (ljusare bakgrund) */
     [data-theme="blue"]{
       --theme-primary:#5863C7;
       --theme-primary-dark:#362E7D;
@@ -54,13 +55,14 @@
       --theme-tint1:#DBDEF4;
       --theme-tint2:#EFF2FF;
       --theme-primary-rgb:88,99,199;
-      --page-bg-1:#1B2233;
-      --page-bg-2:#141A28;
+      --page-bg-1:#20273a;
+      --page-bg-2:#181f2c;
       --bg-primary:#F0F2F5;
       --glass-bg:#FFFFFF;
       --card-accent:rgba(88, 99, 199, 0.03);
     }
 
+    /* Grön (ljusare bakgrund) */
     [data-theme="green"]{
       --theme-primary:#00A78B;
       --theme-primary-dark:#0F6F60;
@@ -68,13 +70,14 @@
       --theme-tint1:#D2EFE7;
       --theme-tint2:#EEFAF7;
       --theme-primary-rgb:0,167,139;
-      --page-bg-1:#152420;
-      --page-bg-2:#101C19;
+      --page-bg-1:#1c2f28; /* var #152420 */
+      --page-bg-2:#15241f; /* var #101C19 */
       --bg-primary:#EEFAF7;
       --glass-bg:#FDFFFE;
       --card-accent:rgba(0, 167, 139, 0.03);
     }
 
+    /* Lila (ljusare bakgrund) */
     [data-theme="purple"]{
       --theme-primary:#9D3E9E;
       --theme-primary-dark:#622977;
@@ -82,13 +85,14 @@
       --theme-tint1:#ECD8EB;
       --theme-tint2:#FFF1FE;
       --theme-primary-rgb:157,62,158;
-      --page-bg-1:#23172B;
-      --page-bg-2:#1B1222;
+      --page-bg-1:#2a1d33; /* var #23172B */
+      --page-bg-2:#21182a; /* var #1B1222 */
       --bg-primary:#FFF1FE;
       --glass-bg:#FFFEFF;
       --card-accent:rgba(157, 62, 158, 0.03);
     }
 
+    /* Röd (ljusare bakgrund) */
     [data-theme="red"]{
       --theme-primary:#D5422D;
       --theme-primary-dark:#89281F;
@@ -96,13 +100,14 @@
       --theme-tint1:#FCDBDA;
       --theme-tint2:#FEEFEE;
       --theme-primary-rgb:213,66,45;
-      --page-bg-1:#2A1919;
-      --page-bg-2:#201213;
+      --page-bg-1:#311e1e; /* var #2A1919 */
+      --page-bg-2:#261818; /* var #201213 */
       --bg-primary:#FEEFEE;
       --glass-bg:#FFFCFC;
       --card-accent:rgba(213, 66, 45, 0.03);
     }
 
+    /* Grå (ljusare bakgrund) */
     [data-theme="gray"]{
       --theme-primary:#48606B;
       --theme-primary-dark:#2A2F31;
@@ -110,18 +115,18 @@
       --theme-tint1:#DBDFE0;
       --theme-tint2:#EFF3F4;
       --theme-primary-rgb:72,96,107;
-      --page-bg-1:#1A2023;
-      --page-bg-2:#14181B;
+      --page-bg-1:#1f2528; /* var #1A2023 */
+      --page-bg-2:#181d20; /* var #14181B */
       --bg-primary:#EFF3F4;
       --glass-bg:#FAFBFB;
       --card-accent:rgba(72, 96, 107, 0.03);
     }
 
-    /* SIDA: mörkare bakgrund som följer temat, korten förblir ljusa */
+    /* SIDA: mörkare (nu lite ljusare) bakgrund som följer temat, korten förblir ljusa */
     body{
       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
       background:
-        radial-gradient(1100px 520px at 10% -10%, rgba(var(--theme-primary-rgb),0.12), transparent 60%),
+        radial-gradient(1100px 520px at 10% -10%, rgba(var(--theme-primary-rgb),0.10), transparent 60%),
         linear-gradient(180deg, var(--page-bg-1), var(--page-bg-2));
       min-height:100vh;
       color:#E9EEF5;
@@ -960,7 +965,6 @@
         setCurrentTheme(themeId);
         localStorage.setItem('siteTheme', themeId);
         document.documentElement.setAttribute('data-theme', themeId);
-        // Tvinga style-recalc på bakgrunden
         window.getComputedStyle(document.documentElement).getPropertyValue('--page-bg-1');
       };
 
