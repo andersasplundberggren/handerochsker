@@ -1020,11 +1020,15 @@
 
       useEffect(() => {
         document.documentElement.setAttribute('data-theme', currentTheme);
+        // Force a reflow to ensure CSS updates
+        document.body.offsetHeight;
       }, [currentTheme]);
 
       const changeTheme = (themeId) => {
         setCurrentTheme(themeId);
         localStorage.setItem('siteTheme', themeId);
+        // Immediately set the attribute
+        document.documentElement.setAttribute('data-theme', themeId);
       };
 
       return (
@@ -1036,9 +1040,14 @@
                 key={theme.id}
                 className={`theme-btn ${currentTheme === theme.id ? 'active' : ''}`}
                 data-theme={theme.id}
-                onClick={() => changeTheme(theme.id)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  changeTheme(theme.id);
+                }}
                 title={theme.name}
                 aria-label={`Välj ${theme.name} tema`}
+                type="button"
               />
             ))}
           </div>
